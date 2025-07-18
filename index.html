@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Служба поддержки пользователей</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --orange: #ff6d00;
+        --orange-light: #ff9e40;
+        --orange-dark: #dd2c00;
+        --blue: #1565c0;
+        --blue-light: #5e92f3;
+        --white: #ffffff;
+        --black: #121212;
+        --gray: #f5f5f7;
+        --yellow: #f7d61f;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", system-ui, sans-serif;
+      }
+
+      body {
+        background: var(--gray);
+        color: var(--black);
+        overflow-x: hidden;
+        line-height: 1.6;
+      }
+
+      #canvas3d {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 1.2s ease;
+      }
+
+      .content-visible #canvas3d {
+        opacity: 1;
+      }
+
+      .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        opacity: 0;
+        transition: opacity 1s ease;
+      }
+
+      .content-visible .container {
+        opacity: 1;
+      }
+
+      .scroll-down #canvas3d {
+        opacity: 0.3;
+      }
+
+      /* Стили для заставки */
+      .intro-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        flex-direction: column;
+      }
+
+      .intro-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .intro-text {
+        font-size: 4rem;
+        font-weight: 800;
+        color: var(--yellow);
+        text-align: center;
+        line-height: 1.2;
+      }
+
+      .intro-text span {
+        color: var(--black);
+        display: block;
+      }
+
+      .intro-image {
+        width: 180px;
+        height: 180px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .intro-image img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+
+      .loading-bar {
+        width: 300px;
+        height: 6px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .loading-progress {
+        height: 100%;
+        background: var(--orange);
+        width: 0%;
+        transition: width 0.5s ease;
+      }
+
+      /* Header Styles */
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 0;
+        position: relative;
+        z-index: 10;
+        gap: 1rem;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--orange);
+      }
+
+      .logo span {
+        color: var(--blue);
+      }
+
+      .nav-container {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-grow: 1;
+        justify-content: flex-end;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      nav a {
+        color: var(--black);
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem 0.8rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      nav a i {
+        margin-right: 0.5rem;
+      }
+
+      nav a:hover {
+        background: rgba(255, 109, 0, 0.1);
+        color: var(--orange);
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--orange);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .user-avatar:hover {
+        background: var(--orange-dark);
+        transform: scale(1.1);
+      }
+
+      /* Hero Section */
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        z-index: 5;
+        padding-top: 5rem;
+      }
+
+      .hero-content {
+        max-width: 700px;
+      }
+
+      h1 {
+        font-size: 4rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+      }
+
+      .hero-highlight {
+        color: var(--orange);
+      }
+
+      .subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 2.5rem;
+        color: var(--black);
+        opacity: 0.9;
+        max-width: 600px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem 2.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        gap: 0.8rem;
+        font-size: 1.1rem;
+        border: none;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background: var(--orange);
+        color: var(--white);
+        box-shadow: 0 10px 20px rgba(255, 109, 0, 0.25);
+      }
+
+      .btn-primary:hover {
+        background: var(--orange-dark);
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(255, 109, 0, 0.35);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: var(--blue);
+        border: 2px solid var(--blue);
+        margin-left: 1rem;
+      }
+
+      .btn-secondary:hover {
+        background: rgba(21, 101, 192, 0.05);
+        transform: translateY(-3px);
+      }
+
+      /* Features Section */
+      .section {
+        padding: 8rem 0;
+        position: relative;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 5rem;
+        position: relative;
+      }
+
+      .section-title:after {
+        content: "";
+        position: absolute;
+        bottom: -1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 5px;
+        background: var(--orange);
+        border-radius: 5px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2.5rem;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        transition: all 0.4s ease;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+      }
+
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border-color: rgba(255, 109, 0, 0.2);
+      }
+
+      .card-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 109, 0, 0.1);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        color: var(--orange);
+        font-size: 1.8rem;
+      }
+
+      .card h3 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        color: var(--black);
+      }
+
+      .card p {
+        color: var(--black);
+        opacity: 0.8;
+        margin-bottom: 1.5rem;
+      }
+
+      .card-link {
+        display: inline-flex;
+        align-items: center;
+        color: var(--blue);
+        text-decoration: none;
+        font-weight: 600;
+        gap: 0.5rem;
+      }
+
+      .card-link:hover {
+        color: var(--blue-light);
+      }
+
+      /* Resources Section */
+      .resources {
+        background: var(--white);
+        border-radius: 30px;
+        padding: 4rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+        margin-top: 2rem;
+      }
+
+      .resources-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+      }
+
+      .resource-card {
+        display: flex;
+        flex-direction: column;
+        padding: 2rem;
+        border-radius: 18px;
+        background: var(--gray);
+        transition: all 0.3s ease;
+      }
+
+      .resource-card:hover {
+        background: rgba(21, 101, 192, 0.05);
+        transform: translateY(-5px);
+      }
+
+      .resource-card h4 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+
+      /* Team Section */
+      .team {
+        background: var(--white);
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+      }
+
+      .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        padding: 3rem;
+      }
+
+      .team-member {
+        text-align: center;
+      }
+
+      .member-photo {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 1.5rem;
+        border: 5px solid var(--white);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .member-name {
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .member-role {
+        color: var(--orange);
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      /* Footer */
+      footer {
+        background: var(--black);
+        color: var(--white);
+        padding: 5rem 0 3rem;
+        margin-top: 6rem;
+        border-radius: 30px 30px 0 0;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 3rem;
+      }
+
+      .footer-column h4 {
+        font-size: 1.4rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+      }
+
+      .footer-column h4:after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: var(--orange);
+      }
+
+      .footer-links {
+        list-style: none;
+      }
+
+      .footer-links li {
+        margin-bottom: 0.8rem;
+      }
+
+      .footer-links a {
+        color: #ccc;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .footer-links a:hover {
+        color: var(--white);
+        padding-left: 5px;
+      }
+
+      .social-links {
+        display: flex;
+        gap: 1.2rem;
+        margin-top: 1.5rem;
+      }
+
+      .social-links a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: var(--white);
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+      }
+
+      .social-links a:hover {
+        background: var(--orange);
+        transform: translateY(-3px);
+      }
+
+      .copyright {
+        text-align: center;
+        padding-top: 4rem;
+        color: #aaa;
+        font-size: 0.9rem;
+      }
+
+      /* Animation Classes */
+      .animate-in {
+        animation: fadeInUp 0.8s ease-out forwards;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .delay-1 {
+        animation-delay: 0.2s;
+      }
+
+      .delay-2 {
+        animation-delay: 0.4s;
+      }
+
+      .delay-3 {
+        animation-delay: 0.6s;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 992px) {
+        h1 {
+          font-size: 3rem;
+        }
+
+        .intro-text {
+          font-size: 3rem;
+        }
+
+        .intro-image {
+          width: 140px;
+          height: 140px;
+        }
+
+        .section {
+          padding: 6rem 0;
+        }
+
+        nav ul {
+          gap: 1.2rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero {
+          text-align: center;
+        }
+
+        .hero-content {
+          margin: 0 auto;
+        }
+
+        .btn-container {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .btn {
+          margin-left: 0 !important;
+          width: 100%;
+        }
+
+        header {
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+        
+        .nav-container {
+          width: 100%;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .intro-text {
+          font-size: 2.2rem;
+        }
+
+        .intro-image {
+          width: 120px;
+          height: 120px;
+          margin-bottom: 20px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .intro-text {
+          font-size: 1.8rem;
+        }
+
+        .intro-image {
+          width: 100px;
+          height: 100px;
+        }
+        
+        nav ul {
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Заставка с логотипом и прогрессом -->
+    <div class="intro-overlay" id="introOverlay">
+      <div class="intro-container">
+        <div class="intro-image">
+          <!-- Замените src на путь к вашей картинке -->
+          <img
+            src="C:\Users\Devilcry_Y\Desktop\Сайт для работы\Варианты для начальной страницы ТЭ\Второй вариант\rosneft.jpg"
+            alt="Техэксперт"
+          />
+        </div>
+        <div class="intro-text"><span>Служба поддержки</span>Техэксперт</div>
+      </div>
+      <div class="loading-bar">
+        <div class="loading-progress" id="loadingProgress"></div>
+      </div>
+    </div>
+
+    <!-- Основной 3D фон -->
+    <canvas id="canvas3d"></canvas>
+
+    <!-- Основной контент -->
+    <div class="container">
+      <!-- Header -->
+      <header>
+        <div class="logo">
+          <i class="fas fa-graduation-cap"></i>
+          <span>Информпроект</span>Групп
+        </div>
+        
+        <div class="nav-container">
+          <nav>
+            <ul>
+              <li>
+                <a href="#"><i class="fas fa-fire"></i> Новинки</a>
+              </li>
+              <li>
+                <a href="training.html"><i class="fas fa-book"></i> Обучение</a>
+              </li>
+              <li>
+                <a href="#resources"
+                  ><i class="fas fa-certificate"></i> Сертификация</a
+                >
+              </li>
+              <li>
+                <a href="#team"><i class="fas fa-users"></i> Команда</a>
+              </li>
+              <li>
+                <a href="#"><i class="fas fa-headset"></i> Поддержка</a>
+              </li>
+            </ul>
+          </nav>
+          
+          <!-- Иконка профиля -->
+          <div class="user-avatar" id="userAvatar" title="Личный кабинет">ИИ</div>
+        </div>
+      </header>
+
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="hero-content animate-in">
+          <h1>
+            Служба <span class="hero-highlight">поддержки</span> пользователей
+            Техэксперт
+          </h1>
+          <p class="subtitle">
+            Профессиональное обучение, сертификация и экспертная поддержка для
+            специалистов РН-Ванкор
+          </p>
+          <div class="btn-container">
+            <a href="https://te.dc-ipk.ru/docs" class="btn btn-primary">
+              <i class="fas fa-rocket"></i> Войти: Техэксперт. Премиум
+            </a>
+            <a href="#features" class="btn btn-secondary">
+              <i class="fas fa-search"></i> Сервисы поддержки
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section class="section" id="features">
+        <h2 class="section-title">Наши возможности</h2>
+        <div class="grid">
+          <div class="card animate-in delay-1">
+            <div class="card-icon">
+              <i class="fas fa-bullhorn"></i>
+            </div>
+            <h3>Важная информация</h3>
+            <p>
+              Последние обновления, новости отрасли и критические изменения в
+              системе
+            </p>
+            <a href="#" class="card-link">
+              Подробнее <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="card animate-in delay-2">
+            <div class="card-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <h3>Запись на обучение</h3>
+            <p>
+              Выберите нужную отрасль и зарегистрируйтесь на ближайшую удобную
+              дату
+            </p>
+            <a href="#" class="card-link">
+              Выбрать курс <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="card animate-in delay-3">
+            <div class="card-icon">
+              <i class="fas fa-award"></i>
+            </div>
+            <h3>Сертификация</h3>
+            <p>Подтвердите свои навыки пользователя системы сертификатом</p>
+            <a href="#" class="card-link">
+              Пройти тест <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Resources Section -->
+      <section class="section" id="resources">
+        <h2 class="section-title">Информационные ресурсы</h2>
+        <div class="resources">
+          <div class="resources-grid">
+            <a href="https://te.dc-ipk.ru/resource1" class="resource-card">
+              <h4><i class="fas fa-database"></i> База знаний</h4>
+              <p>Техническая документация, руководства и инструкции</p>
+            </a>
+
+            <a href="https://te.dc-ipk.ru/resource2" class="resource-card">
+              <h4><i class="fas fa-comments"></i> Формы обратной связи</h4>
+              <p>Сообщество специалистов и экспертов для решения задач</p>
+            </a>
+
+            <a href="https://te.dc-ipk.ru/resource3" class="resource-card">
+              <h4><i class="fas fa-chart-line"></i> Видеообучения</h4>
+              <p>Подборка актуальных видеоматериалов по работе с Техэксперт</p>
+            </a>
+
+            <a href="https://te.dc-ipk.ru/resource4" class="resource-card">
+              <h4><i class="fas fa-book"></i> Библиотека ресурсов</h4>
+              <p>Шаблоны, примеры и лучшие практики</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Team Section -->
+      <section class="section" id="team">
+        <h2 class="section-title">Наша команда</h2>
+        <div class="team">
+          <div class="team-grid">
+            <div class="team-member animate-in">
+              <img
+                src="C:\Users\Devilcry_Y\Desktop\Сайт для работы\Варианты для начальной страницы ТЭ\Второй вариант\nikita.png"
+                alt="Эксперт"
+                class="member-photo"
+              />
+              <h3 class="member-name">Шепелин Никита</h3>
+              <p class="member-role">Главный крутышка проекта</p>
+              <p>25+ лет опыта на планете Земля</p>
+            </div>
+
+            <div class="team-member animate-in delay-1">
+              <img
+                src="C:\Users\Devilcry_Y\Desktop\Сайт для работы\Варианты для начальной страницы ТЭ\Второй вариант\alex.jpg"
+                alt="Эксперт"
+                class="member-photo"
+              />
+              <h3 class="member-name">Алексей Гречко</h3>
+              <p class="member-role">Главный задумыватель</p>
+              <p>Сколько опыта не знаем, он он есть</p>
+            </div>
+
+            <div class="team-member animate-in delay-2">
+              <img
+                src="C:\Users\Devilcry_Y\Desktop\Сайт для работы\Варианты для начальной страницы ТЭ\Второй вариант\4uvak.jpeg"
+                alt="Эксперт"
+                class="member-photo"
+              />
+              <h3 class="member-name">Тестовый Чувак</h3>
+              <p class="member-role">Технический эксперт</p>
+              <p>Специалист сопровождения</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-column">
+            <h4>Служба поддержки пользователей</h4>
+            <p>
+              Преобразуем работу специалистов с нормативно-технической
+              документацией в оптимизированное хобби
+            </p>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-vk"></i></a>
+              <a href="#"><i class="fab fa-telegram"></i></a>
+              <a href="#"><i class="fab fa-youtube"></i></a>
+              <a href="#"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+
+          <div class="footer-column">
+            <h4>Ресурсы</h4>
+            <ul class="footer-links">
+              <li><a href="#">Документация</a></li>
+              <li><a href="#">Блог</a></li>
+              <li><a href="#">Вебинары</a></li>
+              <li><a href="#">Частые вопросы</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Обучение</h4>
+            <ul class="footer-links">
+              <li><a href="#">Курсы</a></li>
+              <li><a href="#">Сертификация</a></li>
+              <li><a href="#">Расписание</a></li>
+              <li><a href="#">Групповое обучение</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Контакты</h4>
+            <ul class="footer-links">
+              <li>
+                <a href="#"
+                  ><i class="fas fa-envelope"></i> vankor@iprosoft.ru</a
+                >
+              </li>
+              <li>
+                <a href="#"><i class="fas fa-phone"></i> +8 800 555 3535</a>
+              </li>
+              <li>
+                <a href="#"
+                  ><i class="fas fa-map-marker-alt"></i> Москва, ул.
+                  Четапоказабыл, 007</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="copyright">
+          <p>© 2025 Информпроект Групп. Служба поддержки "РН-Ванкор".</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+      // ================== АНИМАЦИЯ ЗАГРУЗКИ ==================
+      const introOverlay = document.getElementById("introOverlay");
+      const loadingProgress = document.getElementById("loadingProgress");
+
+      // Создаем сцену для основного фона
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xffffff);
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById("canvas3d"),
+        alpha: true,
+        antialias: true,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      // Увеличенная геометрия для фона
+      const points = [];
+      const pointCount = 100; // Увеличили количество точек
+
+      for (let i = 0; i < pointCount; i++) {
+        points.push({
+          position: new THREE.Vector3(
+            (Math.random() - 0.5) * 100, // Увеличенный диапазон по X
+            (Math.random() - 0.5) * 100, // Увеличенный диапазон по Y
+            (Math.random() - 0.5) * 100 // Увеличенный диапазон по Z
+          ),
+          velocity: new THREE.Vector3(
+            (Math.random() - 0.5) * 0.05, // Увеличенная скорость
+            (Math.random() - 0.5) * 0.05,
+            (Math.random() - 0.5) * 0.05
+          ),
+        });
+      }
+
+      // Материал для линий
+      const lineMaterial = new THREE.LineBasicMaterial({
+        color: 0xff6d00,
+        transparent: true,
+        opacity: 0.2,
+        linewidth: 1,
+      });
+
+      // Группа для всех линий
+      const lineGroup = new THREE.Group();
+      scene.add(lineGroup);
+
+      camera.position.z = 50; // Увеличенное расстояние камеры
+      camera.position.y = 20; // Смещение камеры для лучшего обзора
+
+      // Анимация загрузки
+      let progress = 0;
+      const loadingInterval = setInterval(() => {
+        progress += 2;
+        loadingProgress.style.width = `${progress}%`;
+
+        if (progress >= 100) {
+          clearInterval(loadingInterval);
+          // Плавное скрытие заставки
+          introOverlay.style.opacity = "0";
+          introOverlay.style.transform = "scale(1.1)";
+          introOverlay.style.transition = "all 0.8s ease";
+
+          setTimeout(() => {
+            introOverlay.style.display = "none";
+            document.body.classList.add("content-visible");
+          }, 800);
+        }
+      }, 50);
+
+      // Анимация основного фона
+      function animate() {
+        requestAnimationFrame(animate);
+
+        // Очищаем предыдущие линии
+        while (lineGroup.children.length > 0) {
+          lineGroup.remove(lineGroup.children[0]);
+        }
+
+        // Обновляем позиции и создаем соединения
+        points.forEach((point, i) => {
+          point.position.add(point.velocity);
+
+          // Отскок от границ
+          ["x", "y", "z"].forEach((axis) => {
+            if (Math.abs(point.position[axis]) > 50) {
+              // Увеличенные границы
+              point.velocity[axis] *= -1;
+            }
+          });
+
+          // Создаем линии между близкими точками
+          for (let j = i + 1; j < points.length; j++) {
+            const distance = point.position.distanceTo(points[j].position);
+            if (distance < 15) {
+              // Увеличенный радиус соединения
+              const geometry = new THREE.BufferGeometry().setFromPoints([
+                point.position,
+                points[j].position,
+              ]);
+              const line = new THREE.Line(geometry, lineMaterial);
+              lineGroup.add(line);
+
+              // Плавное изменение прозрачности в зависимости от расстояния
+              line.material.opacity = 0.3 - (distance / 15) * 0.2;
+            }
+          }
+        });
+
+        // Плавное вращение камеры
+        camera.position.x = Math.sin(Date.now() * 0.0005) * 30;
+        camera.position.z = 50 + Math.cos(Date.now() * 0.0003) * 20;
+        camera.lookAt(scene.position);
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      // Обработчик изменения размера окна
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Анимация при прокрутке
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("animate-in");
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+
+      document.querySelectorAll(".card, .team-member").forEach((el) => {
+        observer.observe(el);
+      });
+      
+      // Переход в личный кабинет при клике на аватар
+      document.getElementById('userAvatar').addEventListener('click', function() {
+        window.location.href = 'account.html';
+      });
+    </script>
+  </body>
+</html>

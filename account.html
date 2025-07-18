@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | Техэксперт</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --orange: #ff6d00;
+            --orange-light: #ff9e40;
+            --orange-dark: #dd2c00;
+            --blue: #1565c0;
+            --blue-light: #5e92f3;
+            --white: #ffffff;
+            --black: #121212;
+            --gray: #f5f5f7;
+            --gray-dark: #e0e0e0;
+            --yellow: #f7d61f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", system-ui, sans-serif;
+        }
+
+        body {
+            background: var(--gray);
+            color: var(--black);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        #canvas3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            position: relative;
+            z-index: 10;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--orange);
+            flex-shrink: 0;
+        }
+
+        .logo span {
+            color: var(--blue);
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-grow: 1;
+            justify-content: flex-end;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1rem;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+
+        nav a {
+            color: var(--black);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        nav a i {
+            margin-right: 0.5rem;
+        }
+
+        nav a:hover {
+            background: rgba(255, 109, 0, 0.1);
+            color: var(--orange);
+        }
+
+        nav a.active {
+            background: rgba(255, 109, 0, 0.15);
+            color: var(--orange);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--orange);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Личный кабинет */
+        .dashboard-section {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            margin: 3rem 0;
+            display: flex;
+            min-height: 70vh;
+        }
+
+        .dashboard-sidebar {
+            width: 280px;
+            background: var(--black);
+            color: white;
+            padding: 2rem 1.5rem;
+        }
+
+        .user-card {
+            text-align: center;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--orange);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1rem;
+            font-weight: bold;
+        }
+
+        .user-name {
+            font-size: 1.4rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .user-email {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .dashboard-menu {
+            list-style: none;
+        }
+
+        .dashboard-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-menu a {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            color: #ccc;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .dashboard-menu a:hover, 
+        .dashboard-menu a.active {
+            background: var(--orange);
+            color: white;
+        }
+
+        .dashboard-menu i {
+            margin-right: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .dashboard-content {
+            flex: 1;
+            padding: 2.5rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            color: var(--blue);
+        }
+
+        .dashboard-section-content {
+            display: none;
+        }
+
+        .dashboard-section-content.active {
+            display: block;
+        }
+
+        /* Стили для профиля */
+        .profile-form {
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem 1.8rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            gap: 0.6rem;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--orange);
+            color: var(--white);
+            box-shadow: 0 5px 15px rgba(255, 109, 0, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: var(--orange-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 109, 0, 0.35);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--orange);
+            color: var(--orange);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 109, 0, 0.1);
+        }
+
+        /* Стили для курсов */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .course-card {
+            background: var(--gray);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 1px solid var(--gray-dark);
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .course-header {
+            background: var(--blue);
+            color: white;
+            padding: 1rem;
+        }
+
+        .course-body {
+            padding: 1.5rem;
+        }
+
+        .course-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .progress {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--orange);
+            border-radius: 4px;
+        }
+
+        /* Стили для сертификатов */
+        .certificates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .certificate-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray-dark);
+        }
+
+        .certificate-header {
+            background: linear-gradient(135deg, var(--blue), var(--blue-light));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .certificate-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .certificate-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .certificate-date {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .certificate-body {
+            padding: 1.5rem;
+        }
+
+        .certificate-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 992px) {
+            .dashboard-section {
+                flex-direction: column;
+            }
+            
+            .dashboard-sidebar {
+                width: 100%;
+            }
+            
+            .dashboard-menu {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .dashboard-menu li {
+                margin-bottom: 0;
+            }
+            
+            .dashboard-menu a {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .courses-grid,
+            .certificates-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .certificate-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Основной контент -->
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Информпроект</span>Групп
+            </div>
+            
+            <div class="nav-container">
+                <nav>
+                    <ul>
+                        <li><a href="index2.html"><i class="fas fa-fire"></i> Новинки</a></li>
+                        <li><a href="training.html"><i class="fas fa-book"></i> Обучение</a></li>
+                        <li><a href="#"><i class="fas fa-certificate"></i> Сертификация</a></li>
+                        <li><a href="#"><i class="fas fa-users"></i> Команда</a></li>
+                        <li><a href="#" class="active"><i class="fas fa-user"></i> Кабинет</a></li>
+                    </ul>
+                </nav>
+                
+                <div class="user-avatar" id="userAvatar">ИИ</div>
+            </div>
+        </header>
+
+        <!-- Личный кабинет -->
+        <section class="dashboard-section">
+            <div class="dashboard-sidebar">
+                <div class="user-card">
+                    <div class="user-avatar-large" id="userAvatarLarge">ИИ</div>
+                    <h3 class="user-name" id="userName">Иван Иванов</h3>
+                    <p class="user-email" id="userEmail">ivan@example.com</p>
+                </div>
+                
+                <ul class="dashboard-menu">
+                    <li><a href="#profile" class="active" data-section="profile"><i class="fas fa-user"></i> Профиль</a></li>
+                    <li><a href="#courses" data-section="courses"><i class="fas fa-book"></i> Мои курсы</a></li>
+                    <li><a href="#certificates" data-section="certificates"><i class="fas fa-award"></i> Сертификаты</a></li>
+                    <li><a href="#settings" data-section="settings"><i class="fas fa-cog"></i> Настройки</a></li>
+                    <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Выход</a></li>
+                </ul>
+            </div>
+            
+            <div class="dashboard-content">
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title">Личный кабинет</h2>
+                    <div id="lastLogin">Последний вход: 10.07.2025 14:30</div>
+                </div>
+                
+                <!-- Профиль -->
+                <div id="profile-section" class="dashboard-section-content active">
+                    <h3>Профиль пользователя</h3>
+                    <p class="text-muted">Управление вашими личными данными</p>
+                    
+                    <form id="profileForm" class="profile-form">
+                        <div class="form-group">
+                            <label for="fullName">ФИО</label>
+                            <input type="text" id="fullName" class="form-control" value="Иван Иванов">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" class="form-control" value="ivan@example.com" disabled>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Телефон</label>
+                            <input type="tel" id="phone" class="form-control" value="+7 (999) 123-45-67">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="company">Компания</label>
+                            <input type="text" id="company" class="form-control" value="РН-Ванкор">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="position">Должность</label>
+                            <input type="text" id="position" class="form-control" value="Специалист по охране труда">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Сохранить изменения
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Мои курсы -->
+                <div id="courses-section" class="dashboard-section-content">
+                    <h3>Мои обучающие курсы</h3>
+                    <p class="text-muted">Ваши текущие и завершенные программы обучения</p>
+                    
+                    <div class="courses-grid">
+                        <!-- Курс 1 -->
+                        <div class="course-card">
+                            <div class="course-header">
+                                <h4>Техэксперт: Охрана труда</h4>
+                            </div>
+                            <div class="course-body">
+                                <h5 class="course-title">Базовый курс для специалистов</h5>
+                                <div class="course-meta">
+                                    <span><i class="far fa-calendar"></i> 10.07 - 15.07.2025</span>
+                                    <span><i class="far fa-clock"></i> 12 часов</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 65%"></div>
+                                </div>
+                                <p>Прогресс: 65%</p>
+                                <button class="btn btn-primary mt-2">
+                                    <i class="fas fa-play-circle"></i> Продолжить
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Курс 2 -->
+                        <div class="course-card">
+                            <div class="course-header">
+                                <h4>Экологическая документация</h4>
+                            </div>
+                            <div class="course-body">
+                                <h5 class="course-title">Работа с нормативными актами</h5>
+                                <div class="course-meta">
+                                    <span><i class="far fa-calendar"></i> 18.07 - 25.07.2025</span>
+                                    <span><i class="far fa-clock"></i> 8 часов</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 30%"></div>
+                                </div>
+                                <p>Прогресс: 30%</p>
+                                <button class="btn btn-primary mt-2">
+                                    <i class="fas fa-play-circle"></i> Начать
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Курс 3 -->
+                        <div class="course-card">
+                            <div class="course-header" style="background: #4caf50;">
+                                <h4>Модуль kAssist</h4>
+                            </div>
+                            <div class="course-body">
+                                <h5 class="course-title">Техническое документирование</h5>
+                                <div class="course-meta">
+                                    <span><i class="far fa-calendar"></i> 01.06 - 05.06.2025</span>
+                                    <span><i class="fas fa-check-circle"></i> Завершен</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 100%"></div>
+                                </div>
+                                <p>Оценка: 92/100</p>
+                                <button class="btn btn-outline mt-2">
+                                    <i class="fas fa-redo"></i> Повторить курс
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Сертификаты -->
+                <div id="certificates-section" class="dashboard-section-content">
+                    <h3>Мои сертификаты</h3>
+                    <p class="text-muted">Подтверждение ваших профессиональных навыков</p>
+                    
+                    <div class="certificates-grid">
+                        <!-- Сертификат 1 -->
+                        <div class="certificate-card">
+                            <div class="certificate-header">
+                                <div class="certificate-icon">
+                                    <i class="fas fa-award"></i>
+                                </div>
+                                <h4 class="certificate-title">Специалист Техэксперт</h4>
+                                <p class="certificate-date">Выдан: 05.06.2025</p>
+                            </div>
+                            <div class="certificate-body">
+                                <p>Направление: Охрана труда</p>
+                                <p>Уровень: Продвинутый</p>
+                                <div class="certificate-actions">
+                                    <button class="btn btn-primary">
+                                        <i class="fas fa-eye"></i> Просмотреть
+                                    </button>
+                                    <button class="btn btn-outline">
+                                        <i class="fas fa-download"></i> Скачать PDF
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Сертификат 2 -->
+                        <div class="certificate-card">
+                            <div class="certificate-header" style="background: linear-gradient(135deg, #9c27b0, #673ab7);">
+                                <div class="certificate-icon">
+                                    <i class="fas fa-medal"></i>
+                                </div>
+                                <h4 class="certificate-title">Эксперт по НТД</h4>
+                                <p class="certificate-date">Выдан: 20.05.2025</p>
+                            </div>
+                            <div class="certificate-body">
+                                <p>Направление: Нормативно-техническая документация</p>
+                                <p>Уровень: Профессионал</p>
+                                <div class="certificate-actions">
+                                    <button class="btn btn-primary">
+                                        <i class="fas fa-eye"></i> Просмотреть
+                                    </button>
+                                    <button class="btn btn-outline">
+                                        <i class="fas fa-download"></i> Скачать PDF
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Настройки -->
+                <div id="settings-section" class="dashboard-section-content">
+                    <h3>Настройки аккаунта</h3>
+                    <p class="text-muted">Управление вашими настройками и безопасностью</p>
+                    
+                    <form id="settingsForm" class="profile-form">
+                        <div class="form-group">
+                            <label>Уведомления</label>
+                            <div style="display: flex; gap: 1rem;">
+                                <label style="display: flex; align-items: center;">
+                                    <input type="checkbox" checked> Email-уведомления
+                                </label>
+                                <label style="display: flex; align-items: center;">
+                                    <input type="checkbox" checked> Push-уведомления
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <h4>Смена пароля</h4>
+                        <div class="form-group">
+                            <label for="currentPassword">Текущий пароль</label>
+                            <input type="password" id="currentPassword" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newPassword">Новый пароль</label>
+                            <input type="password" id="newPassword" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">Подтвердите пароль</label>
+                            <input type="password" id="confirmPassword" class="form-control">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-lock"></i> Обновить пароль
+                        </button>
+                        
+                        <hr style="margin: 2rem 0;">
+                        
+                        <h4>Двухфакторная аутентификация</h4>
+                        <p>Добавьте дополнительный уровень безопасности к вашему аккаунту</p>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center;">
+                                <input type="checkbox"> Включить 2FA
+                            </label>
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline">
+                            <i class="fas fa-trash-alt"></i> Удалить аккаунт
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Инициализация пользователя
+        const user = {
+            name: "Иван Иванов",
+            email: "ivan@example.com",
+            avatar: "ИИ",
+            lastLogin: "10.07.2025 14:30",
+            company: "РН-Ванкор",
+            position: "Специалист по охране труда",
+            phone: "+7 (999) 123-45-67"
+        };
+
+        // Обновление информации о пользователе
+        function updateUserInfo() {
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userAvatar').textContent = user.avatar;
+            document.getElementById('userAvatarLarge').textContent = user.avatar;
+            document.getElementById('lastLogin').textContent = `Последний вход: ${user.lastLogin}`;
+            document.getElementById('fullName').value = user.name;
+            document.getElementById('email').value = user.email;
+            document.getElementById('phone').value = user.phone;
+            document.getElementById('company').value = user.company;
+            document.getElementById('position').value = user.position;
+        }
+
+        // Навигация по разделам ЛК
+        document.querySelectorAll('.dashboard-menu a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Убираем активный класс у всех пунктов меню
+                document.querySelectorAll('.dashboard-menu a').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Добавляем активный класс текущему пункту
+                this.classList.add('active');
+                
+                // Скрываем все разделы
+                document.querySelectorAll('.dashboard-section-content').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Показываем выбранный раздел
+                const targetId = this.getAttribute('data-section');
+                document.getElementById(`${targetId}-section`).classList.add('active');
+            });
+        });
+
+        // Обработка формы профиля
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Обновляем данные пользователя
+            user.name = document.getElementById('fullName').value;
+            user.phone = document.getElementById('phone').value;
+            user.company = document.getElementById('company').value;
+            user.position = document.getElementById('position').value;
+            
+            // Обновляем отображение
+            updateUserInfo();
+            
+            // Показываем уведомление
+            alert('Данные профиля успешно обновлены!');
+        });
+
+        // Обработка выхода
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Вы уверены, что хотите выйти из системы?')) {
+                // В реальном приложении здесь будет запрос на сервер
+                alert('Вы успешно вышли из системы');
+                // Перенаправляем на главную страницу
+                window.location.href = 'index2.html';
+            }
+        });
+
+        // Обработка формы настроек
+        document.getElementById('settingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('Новый пароль и подтверждение не совпадают!');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                alert('Пароль должен содержать не менее 6 символов');
+                return;
+            }
+            
+            // В реальном приложении здесь будет запрос на сервер
+            alert('Пароль успешно изменен!');
+            
+            // Очищаем поля
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        });
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUserInfo();
+        });
+    </script>
+</body>
+</html>

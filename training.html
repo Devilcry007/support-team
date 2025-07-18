@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Обучение | Служба поддержки пользователей</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --orange: #ff6d00;
+        --orange-light: #ff9e40;
+        --orange-dark: #dd2c00;
+        --blue: #1565c0;
+        --blue-light: #5e92f3;
+        --white: #ffffff;
+        --black: #121212;
+        --gray: #f5f5f7;
+        --yellow: #f7d61f;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", system-ui, sans-serif;
+      }
+
+      body {
+        background: var(--gray);
+        color: var(--black);
+        overflow-x: hidden;
+        line-height: 1.6;
+      }
+
+      #canvas3d {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 1.2s ease;
+      }
+
+      .content-visible #canvas3d {
+        opacity: 1;
+      }
+
+      .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        opacity: 0;
+        transition: opacity 1s ease;
+      }
+
+      .content-visible .container {
+        opacity: 1;
+      }
+
+      /* Стили для заставки */
+      .intro-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        flex-direction: column;
+      }
+
+      .intro-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .intro-text {
+        font-size: 4rem;
+        font-weight: 800;
+        color: var(--yellow);
+        text-align: center;
+        line-height: 1.2;
+      }
+
+      .intro-text span {
+        color: var(--black);
+        display: block;
+      }
+
+      .intro-image {
+        width: 180px;
+        height: 180px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .intro-image img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+
+      .loading-bar {
+        width: 300px;
+        height: 6px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .loading-progress {
+        height: 100%;
+        background: var(--orange);
+        width: 0%;
+        transition: width 0.5s ease;
+      }
+
+      /* Header Styles - ВЫРАВНИВАНИЕ НАВИГАЦИИ */
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 0;
+        position: relative;
+        z-index: 10;
+        gap: 2rem;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--orange);
+        flex-shrink: 0;
+      }
+
+      .logo span {
+        color: var(--blue);
+      }
+
+      .nav-container {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-grow: 1;
+        justify-content: flex-end;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 1rem;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+      }
+
+      nav a {
+        color: var(--black);
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem 0.8rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      nav a i {
+        margin-right: 0.5rem;
+      }
+
+      nav a:hover {
+        background: rgba(255, 109, 0, 0.1);
+        color: var(--orange);
+      }
+
+      nav a.active {
+        background: rgba(255, 109, 0, 0.15);
+        color: var(--orange);
+      }
+
+      /* Уменьшенная кнопка "На главную" */
+      .home-icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--orange);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(255, 109, 0, 0.25);
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+
+      .home-icon-btn:hover {
+        background: var(--orange-dark);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 5px 15px rgba(255, 109, 0, 0.35);
+      }
+
+      /* Стили для раздела обучения */
+      .training-section {
+        padding: 5rem 0;
+        position: relative;
+        z-index: 5;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+        position: relative;
+      }
+
+      .section-title:after {
+        content: "";
+        position: absolute;
+        bottom: -1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 5px;
+        background: var(--orange);
+        border-radius: 5px;
+      }
+
+      .training-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+        margin-top: 2rem;
+      }
+
+      .events-column,
+      .calendar-column {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+      }
+
+      .events-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .events-header h3 {
+        font-size: 1.8rem;
+        color: var(--blue);
+      }
+
+      .events-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .event-card {
+        background: var(--gray);
+        border-radius: 16px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--orange);
+      }
+
+      .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .event-date {
+        color: var(--orange);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .event-title {
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+        color: var(--black);
+      }
+
+      .event-description {
+        color: #555;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+      }
+
+      .event-time {
+        display: inline-block;
+        background: rgba(21, 101, 192, 0.1);
+        color: var(--blue);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.8rem 1.8rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        gap: 0.6rem;
+        font-size: 1rem;
+        border: none;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background: var(--orange);
+        color: var(--white);
+        box-shadow: 0 5px 15px rgba(255, 109, 0, 0.25);
+      }
+
+      .btn-primary:hover {
+        background: var(--orange-dark);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 109, 0, 0.35);
+      }
+
+      /* Стили календаря */
+      .calendar-container {
+        background: var(--gray);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .month-year {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--blue);
+      }
+
+      .nav-buttons-calendar button {
+        background: var(--orange);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .nav-buttons-calendar button:hover {
+        background: var(--orange-dark);
+      }
+
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.5rem;
+      }
+
+      .day-header {
+        text-align: center;
+        font-weight: bold;
+        padding: 0.8rem 0;
+        color: var(--blue);
+        font-size: 1rem;
+      }
+
+      .day {
+        position: relative;
+        height: 75px;
+        background: white;
+        border-radius: 10px;
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        overflow: visible;
+        border: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .day:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .day.has-events {
+        background: rgba(255, 109, 0, 0.05);
+        border: 2px solid var(--orange);
+      }
+
+      .day-number {
+        font-weight: bold;
+        margin-bottom: auto;
+        font-size: 1rem;
+        align-self: flex-start;
+      }
+
+      .event-indicators {
+        display: flex;
+        justify-content: center;
+        gap: 0.3rem;
+        margin-top: auto;
+      }
+
+      .event-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+
+      .event-type-1 {
+        background-color: var(--blue);
+      }
+      .event-type-2 {
+        background-color: var(--orange);
+      }
+      .event-type-3 {
+        background-color: #4caf50;
+      }
+      .event-type-4 {
+        background-color: #9c27b0;
+      }
+
+      .empty-day {
+        background: transparent;
+        border: none;
+        cursor: default;
+      }
+
+      .empty-day:hover {
+        transform: none;
+        box-shadow: none;
+      }
+
+      /* Footer */
+      footer {
+        background: var(--black);
+        color: var(--white);
+        padding: 5rem 0 3rem;
+        margin-top: 5rem;
+        border-radius: 30px 30px 0 0;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 3rem;
+      }
+
+      .footer-column h4 {
+        font-size: 1.4rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+      }
+
+      .footer-column h4:after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: var(--orange);
+      }
+
+      .footer-links {
+        list-style: none;
+      }
+
+      .footer-links li {
+        margin-bottom: 0.8rem;
+      }
+
+      .footer-links a {
+        color: #ccc;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .footer-links a:hover {
+        color: var(--white);
+        padding-left: 5px;
+      }
+
+      .social-links {
+        display: flex;
+        gap: 1.2rem;
+        margin-top: 1.5rem;
+      }
+
+      .social-links a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: var(--white);
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+      }
+
+      .social-links a:hover {
+        background: var(--orange);
+        transform: translateY(-3px);
+      }
+
+      .copyright {
+        text-align: center;
+        padding-top: 4rem;
+        color: #aaa;
+        font-size: 0.9rem;
+      }
+
+      /* Анимации */
+      .animate-in {
+        animation: fadeInUp 0.8s ease-out forwards;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .delay-1 {
+        animation-delay: 0.2s;
+      }
+
+      .delay-2 {
+        animation-delay: 0.4s;
+      }
+
+      .delay-3 {
+        animation-delay: 0.6s;
+      }
+
+      /* Модальное окно */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.5s ease;
+      }
+
+      .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .event-modal {
+        background-color: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 30px;
+        position: relative;
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+      }
+
+      .modal-overlay.active .event-modal {
+        transform: translateY(0);
+      }
+
+      .close-modal {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: var(--orange);
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .close-modal:hover {
+        background: var(--orange-dark);
+        transform: rotate(90deg);
+      }
+
+      .modal-title {
+        color: var(--blue);
+        margin-bottom: 25px;
+        font-size: 1.8rem;
+        padding-right: 40px;
+      }
+
+      .event-item {
+        padding: 20px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .event-item:last-child {
+        border-bottom: none;
+      }
+
+      .event-name {
+        font-weight: bold;
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        color: var(--blue);
+      }
+
+      .event-date {
+        color: var(--orange);
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .event-goal {
+        margin-bottom: 20px;
+        line-height: 1.6;
+        color: #555;
+      }
+
+      .register-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 25px;
+        background: var(--orange);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s;
+        text-decoration: none;
+        margin-right: 10px;
+        gap: 0.5rem;
+        font-weight: 600;
+      }
+
+      .join-conference-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 25px;
+        background: var(--blue);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s;
+        text-decoration: none;
+        gap: 0.5rem;
+        font-weight: 600;
+      }
+
+      .register-btn:hover {
+        background: var(--orange-dark);
+        transform: translateY(-3px);
+      }
+
+      .join-conference-btn:hover {
+        background: var(--blue-light);
+        transform: translateY(-3px);
+      }
+
+      /* Адаптивность */
+      @media (max-width: 1200px) {
+        .training-grid {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+
+        .calendar-column {
+          order: -1;
+        }
+      }
+
+      @media (max-width: 992px) {
+        .section-title {
+          font-size: 2rem;
+        }
+
+        .intro-text {
+          font-size: 3rem;
+        }
+
+        .intro-image {
+          width: 140px;
+          height: 140px;
+        }
+
+        nav ul {
+          gap: 0.8rem;
+        }
+
+        nav a {
+          padding: 0.5rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        header {
+          flex-wrap: wrap;
+          gap: 1rem;
+        }
+
+        .nav-container {
+          order: 3;
+          width: 100%;
+          justify-content: space-between;
+          margin-top: 1rem;
+        }
+
+        nav ul {
+          width: 100%;
+          justify-content: space-between;
+        }
+
+        .home-icon-btn {
+          position: static;
+        }
+
+        .intro-text {
+          font-size: 2.2rem;
+        }
+
+        .intro-image {
+          width: 120px;
+          height: 120px;
+          margin-bottom: 20px;
+        }
+
+        .events-column,
+        .calendar-column {
+          padding: 1.5rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .intro-text {
+          font-size: 1.8rem;
+        }
+
+        .intro-image {
+          width: 100px;
+          height: 100px;
+        }
+
+        .calendar-grid {
+          gap: 0.3rem;
+        }
+
+        .day {
+          height: 60px;
+          padding: 0.3rem;
+        }
+
+        nav a {
+          padding: 0.4rem;
+          font-size: 0.9rem;
+        }
+
+        nav a i {
+          font-size: 1rem;
+          margin-right: 0.3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Заставка с логотипом и прогрессом -->
+    <div class="intro-overlay" id="introOverlay">
+      <div class="intro-container">
+        <div class="intro-image">
+          <img src="rosneft.jpg" alt="Техэксперт" />
+        </div>
+        <div class="intro-text"><span>Обучение</span>Техэксперт</div>
+      </div>
+      <div class="loading-bar">
+        <div class="loading-progress" id="loadingProgress"></div>
+      </div>
+    </div>
+
+    <!-- Основной 3D фон -->
+    <canvas id="canvas3d"></canvas>
+
+    <!-- Основной контент -->
+    <div class="container">
+      <!-- Header - ИСПРАВЛЕННАЯ НАВИГАЦИЯ -->
+      <header>
+        <div class="logo">
+          <i class="fas fa-graduation-cap"></i>
+          <span>Информпроект</span>Групп
+        </div>
+
+        <div class="nav-container">
+          <nav>
+            <ul>
+              <li>
+                <a href="index.html"><i class="fas fa-fire"></i> Новинки</a>
+              </li>
+              <li>
+                <a href="#" class="active"
+                  ><i class="fas fa-book"></i> Обучение</a
+                >
+              </li>
+              <li>
+                <a href="#"><i class="fas fa-certificate"></i> Сертификация</a>
+              </li>
+              <li>
+                <a href="#"><i class="fas fa-users"></i> Команда</a>
+              </li>
+              <li>
+                <a href="#"><i class="fas fa-headset"></i> Поддержка</a>
+              </li>
+            </ul>
+          </nav>
+
+          <a href="index.html" class="home-icon-btn">
+            <i class="fas fa-home"></i>
+          </a>
+        </div>
+      </header>
+
+      <!-- Обучение Section -->
+      <section class="training-section">
+        <h2 class="section-title">Обучение пользователей</h2>
+
+        <div class="training-grid">
+          <!-- Левая колонка: Ближайшие мероприятия -->
+          <div class="events-column animate-in">
+            <div class="events-header">
+              <h3>Ближайшие мероприятия</h3>
+              <a href="#" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Все мероприятия
+              </a>
+            </div>
+
+            <div class="events-list">
+              <!-- Карточка мероприятия 1 -->
+              <div class="event-card animate-in delay-1">
+                <div class="event-date">
+                  <i class="fas fa-calendar-day"></i> 10 июля 2025
+                </div>
+                <h3 class="event-title">
+                  Обучение для специалистов Охраны труда
+                </h3>
+                <p class="event-description">
+                  Базовый курс по работе с системой для специалистов по охране
+                  труда.
+                </p>
+                <div class="event-time">
+                  <i class="fas fa-clock"></i> 10:00 - 12:00
+                </div>
+                <a href="#" class="btn btn-primary">
+                  <i class="fas fa-user-plus"></i> Зарегистрироваться
+                </a>
+              </div>
+
+              <!-- Карточка мероприятия 2 -->
+              <div class="event-card animate-in delay-2">
+                <div class="event-date">
+                  <i class="fas fa-calendar-day"></i> 15 июля 2025
+                </div>
+                <h3 class="event-title">Обучение для специалистов Экологии</h3>
+                <p class="event-description">
+                  Особенности работы с экологической документацией.
+                </p>
+                <div class="event-time">
+                  <i class="fas fa-clock"></i> 14:00 - 16:00
+                </div>
+                <a href="#" class="btn btn-primary">
+                  <i class="fas fa-user-plus"></i> Зарегистрироваться
+                </a>
+              </div>
+
+              <!-- Карточка мероприятия 3 -->
+              <div class="event-card animate-in delay-3">
+                <div class="event-date">
+                  <i class="fas fa-calendar-day"></i> 20 июля 2025
+                </div>
+                <h3 class="event-title">Изучаем kAssist</h3>
+                <p class="event-description">
+                  Основы работы с модулем kAssist для технических писателей.
+                </p>
+                <div class="event-time">
+                  <i class="fas fa-clock"></i> 11:00 - 13:00
+                </div>
+                <a href="#" class="btn btn-primary">
+                  <i class="fas fa-user-plus"></i> Зарегистрироваться
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Правая колонка: Календарь -->
+          <div class="calendar-column animate-in delay-1">
+            <h3>Календарь мероприятий</h3>
+
+            <div class="calendar-container">
+              <div class="calendar-header">
+                <div class="month-year">Июль 2025</div>
+                <div class="nav-buttons-calendar">
+                  <button id="prev-month">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <button id="next-month">
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="calendar-grid" id="calendar-grid">
+                <div class="day-header">Пн</div>
+                <div class="day-header">Вт</div>
+                <div class="day-header">Ср</div>
+                <div class="day-header">Чт</div>
+                <div class="day-header">Пт</div>
+                <div class="day-header">Сб</div>
+                <div class="day-header">Вс</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Подвал -->
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-column">
+            <h4>Служба поддержки пользователей</h4>
+            <p>
+              Преобразуем работу специалистов с нормативно-технической
+              документацией в оптимизированное хобби
+            </p>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-vk"></i></a>
+              <a href="#"><i class="fab fa-telegram"></i></a>
+              <a href="#"><i class="fab fa-youtube"></i></a>
+              <a href="#"><i class="fab fa-github"></i></a>
+            </div>
+          </div>
+
+          <div class="footer-column">
+            <h4>Ресурсы</h4>
+            <ul class="footer-links">
+              <li><a href="#">Документация</a></li>
+              <li><a href="#">Блог</a></li>
+              <li><a href="#">Вебинары</a></li>
+              <li><a href="#">Частые вопросы</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Обучение</h4>
+            <ul class="footer-links">
+              <li><a href="#">Курсы</a></li>
+              <li><a href="#">Сертификация</a></li>
+              <li><a href="#">Расписание</a></li>
+              <li><a href="#">Групповое обучение</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h4>Контакты</h4>
+            <ul class="footer-links">
+              <li>
+                <a href="#"
+                  ><i class="fas fa-envelope"></i> vankor@iprosoft.ru</a
+                >
+              </li>
+              <li>
+                <a href="#"><i class="fas fa-phone"></i> +8 800 555 3535</a>
+              </li>
+              <li>
+                <a href="#"
+                  ><i class="fas fa-map-marker-alt"></i> Москва, ул.
+                  Четапоказабыл, 007</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="copyright">
+          <p>© 2025 Информпроект Групп. Служба поддержки "РН-Ванкор".</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Модальное окно для мероприятий -->
+    <div class="modal-overlay" id="eventModal">
+      <div class="event-modal">
+        <button class="close-modal" id="closeModal">&times;</button>
+        <h2 class="modal-title" id="modalDateTitle">Мероприятия</h2>
+        <div id="eventList"></div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+      // ================== АНИМАЦИЯ ЗАГРУЗКИ ==================
+      const introOverlay = document.getElementById("introOverlay");
+      const loadingProgress = document.getElementById("loadingProgress");
+
+      // Создаем сцену для основного фона
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xffffff);
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById("canvas3d"),
+        alpha: true,
+        antialias: true,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      // Оптимизированная геометрия для фона
+      const points = [];
+      const pointCount = 60; // Уменьшили количество точек для оптимизации
+
+      for (let i = 0; i < pointCount; i++) {
+        points.push({
+          position: new THREE.Vector3(
+            (Math.random() - 0.5) * 80,
+            (Math.random() - 0.5) * 80,
+            (Math.random() - 0.5) * 80
+          ),
+          velocity: new THREE.Vector3(
+            (Math.random() - 0.5) * 0.03,
+            (Math.random() - 0.5) * 0.03,
+            (Math.random() - 0.5) * 0.03
+          ),
+        });
+      }
+
+      // Материал для линий
+      const lineMaterial = new THREE.LineBasicMaterial({
+        color: 0xff6d00,
+        transparent: true,
+        opacity: 0.15,
+        linewidth: 1,
+      });
+
+      // Группа для всех линий
+      const lineGroup = new THREE.Group();
+      scene.add(lineGroup);
+
+      camera.position.z = 50;
+      camera.position.y = 20;
+
+      // Анимация загрузки
+      let progress = 0;
+      const loadingInterval = setInterval(() => {
+        progress += 2;
+        loadingProgress.style.width = `${progress}%`;
+
+        if (progress >= 100) {
+          clearInterval(loadingInterval);
+          // Плавное скрытие заставки
+          introOverlay.style.opacity = "0";
+          introOverlay.style.transform = "scale(1.1)";
+          introOverlay.style.transition = "all 0.8s ease";
+
+          setTimeout(() => {
+            introOverlay.style.display = "none";
+            document.body.classList.add("content-visible");
+          }, 800);
+        }
+      }, 50);
+
+      // Оптимизированная анимация основного фона
+      let lastRenderTime = 0;
+      const targetFPS = 30;
+      const frameInterval = 1000 / targetFPS;
+
+      function animate(timestamp) {
+        requestAnimationFrame(animate);
+
+        // Регулировка FPS
+        const now = timestamp || performance.now();
+        const deltaTime = now - lastRenderTime;
+
+        if (deltaTime < frameInterval) return;
+
+        lastRenderTime = now - (deltaTime % frameInterval);
+
+        // Очищаем предыдущие линии
+        while (lineGroup.children.length > 0) {
+          lineGroup.remove(lineGroup.children[0]);
+        }
+
+        // Обновляем позиции и создаем соединения
+        points.forEach((point, i) => {
+          point.position.add(point.velocity);
+
+          // Отскок от границ
+          ["x", "y", "z"].forEach((axis) => {
+            if (Math.abs(point.position[axis]) > 40) {
+              point.velocity[axis] *= -0.9;
+            }
+          });
+
+          // Создаем линии между близкими точками
+          for (let j = i + 1; j < points.length; j++) {
+            const distance = point.position.distanceTo(points[j].position);
+            if (distance < 20) {
+              const geometry = new THREE.BufferGeometry().setFromPoints([
+                point.position,
+                points[j].position,
+              ]);
+              const line = new THREE.Line(geometry, lineMaterial);
+              lineGroup.add(line);
+              line.material.opacity = 0.2 - (distance / 20) * 0.15;
+            }
+          }
+        });
+
+        // Плавное вращение камеры
+        camera.position.x = Math.sin(Date.now() * 0.0003) * 25;
+        camera.position.z = 50 + Math.cos(Date.now() * 0.0002) * 15;
+        camera.lookAt(scene.position);
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      // Обработчик изменения размера окна
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Анимация при прокрутке
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("animate-in");
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+
+      document
+        .querySelectorAll(".event-card, .calendar-column, .events-column")
+        .forEach((el) => {
+          observer.observe(el);
+        });
+
+      // ================== КАЛЕНДАРЬ МЕРОПРИЯТИЙ ==================
+      document.addEventListener("DOMContentLoaded", function () {
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+
+        const events = {
+          "2025-7-10": [
+            {
+              id: 1,
+              title: "Обучение для специалистов Охраны труда",
+              time: "10:00 - 12:00",
+              type: 1,
+              description:
+                "Базовый курс по работе с системой для специалистов по охране труда.",
+              conferenceId: "n14aab4q4uu2",
+            },
+          ],
+          "2025-7-15": [
+            {
+              id: 2,
+              title: "Обучение для специалистов Экологии",
+              time: "14:00 - 16:00",
+              type: 2,
+              description: "Особенности работы с экологической документацией.",
+              conferenceId: "n14aab4q4uu2",
+            },
+            {
+              id: 3,
+              title: "Обучение для Проектировщиков",
+              time: "16:30 - 18:30",
+              type: 2,
+              description: "Использование системы для проектной документации.",
+              conferenceId: "n14aab4q4uu2",
+            },
+          ],
+          "2025-7-20": [
+            {
+              id: 4,
+              title: "Изучаем kAssist",
+              time: "11:00 - 13:00",
+              type: 3,
+              description:
+                "Основы работы с модулем kAssist для технических писателей.",
+              conferenceId: "n14aab4q4uu2",
+            },
+          ],
+          "2025-7-25": [
+            {
+              id: 5,
+              title: "Система управления НТД",
+              time: "15:00 - 17:00",
+              type: 4,
+              description: "Работа с нормативно-технической документацией.",
+              conferenceId: "n14aab4q4uu2",
+            },
+          ],
+        };
+
+        function generateCalendar(month, year) {
+          const calendarGrid = document.getElementById("calendar-grid");
+          while (calendarGrid.children.length > 7) {
+            calendarGrid.removeChild(calendarGrid.lastChild);
+          }
+
+          const monthNames = [
+            "Январь",
+            "Февраль",
+            "Март",
+            "Апрель",
+            "Май",
+            "Июнь",
+            "Июль",
+            "Август",
+            "Сентябрь",
+            "Октябрь",
+            "Ноябрь",
+            "Декабрь",
+          ];
+          document.querySelector(
+            ".month-year"
+          ).textContent = `${monthNames[month]} ${year}`;
+
+          const firstDay = new Date(year, month, 1);
+          const lastDay = new Date(year, month + 1, 0);
+          const firstDayOfWeek =
+            firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+
+          for (let i = 0; i < firstDayOfWeek; i++) {
+            const emptyDay = document.createElement("div");
+            emptyDay.className = "day empty-day";
+            calendarGrid.appendChild(emptyDay);
+          }
+
+          for (let day = 1; day <= lastDay.getDate(); day++) {
+            const date = new Date(year, month, day);
+            const dateKey = `${year}-${month + 1}-${day}`;
+            const dayEvents = events[dateKey] || [];
+
+            const dayElement = document.createElement("div");
+            dayElement.className = "day";
+
+            if (dayEvents.length > 0) {
+              dayElement.classList.add("has-events");
+            }
+
+            const dayNumber = document.createElement("div");
+            dayNumber.className = "day-number";
+            dayNumber.textContent = day;
+            dayElement.appendChild(dayNumber);
+
+            const eventIndicators = document.createElement("div");
+            eventIndicators.className = "event-indicators";
+
+            dayEvents.forEach((event) => {
+              const indicator = document.createElement("div");
+              indicator.className = `event-indicator event-type-${event.type}`;
+              eventIndicators.appendChild(indicator);
+            });
+
+            dayElement.appendChild(eventIndicators);
+
+            if (dayEvents.length > 0) {
+              dayElement.addEventListener("click", () => {
+                openEventModal(dateKey, dayEvents, day, month + 1, year);
+              });
+            }
+
+            calendarGrid.appendChild(dayElement);
+          }
+        }
+
+        function openEventModal(dateKey, events, day, month, year) {
+          const monthNames = [
+            "января",
+            "февраля",
+            "марта",
+            "апреля",
+            "мая",
+            "июня",
+            "июля",
+            "августа",
+            "сентября",
+            "октября",
+            "ноября",
+            "декабря",
+          ];
+          const formattedDate = `${day} ${monthNames[month - 1]} ${year}`;
+
+          modalDateTitle.textContent = `Мероприятия на ${formattedDate}`;
+          eventList.innerHTML = "";
+
+          events.forEach((event) => {
+            const eventElement = document.createElement("div");
+            eventElement.className = "event-item";
+
+            const title = document.createElement("div");
+            title.className = "event-name";
+            title.textContent = event.title;
+            eventElement.appendChild(title);
+
+            const dateTime = document.createElement("div");
+            dateTime.className = "event-date";
+            dateTime.innerHTML = `<i class="fas fa-calendar-day"></i> ${formattedDate}, <i class="fas fa-clock"></i> ${event.time}`;
+            eventElement.appendChild(dateTime);
+
+            const goal = document.createElement("div");
+            goal.className = "event-goal";
+            goal.textContent = event.description;
+            eventElement.appendChild(goal);
+
+            const registerBtn = document.createElement("a");
+            registerBtn.href = `#`;
+            registerBtn.className = "register-btn";
+            registerBtn.innerHTML = `<i class="fas fa-user-plus"></i> Зарегистрироваться`;
+            eventElement.appendChild(registerBtn);
+
+            const joinBtn = document.createElement("a");
+            joinBtn.href = `#`;
+            joinBtn.className = "join-conference-btn";
+            joinBtn.innerHTML = `<i class="fas fa-video"></i> Присоединиться`;
+            eventElement.appendChild(joinBtn);
+
+            eventList.appendChild(eventElement);
+          });
+
+          eventModal.classList.add("active");
+        }
+
+        generateCalendar(currentMonth, currentYear);
+
+        document
+          .getElementById("prev-month")
+          .addEventListener("click", function () {
+            currentMonth--;
+            if (currentMonth < 0) {
+              currentMonth = 11;
+              currentYear--;
+            }
+            generateCalendar(currentMonth, currentYear);
+          });
+
+        document
+          .getElementById("next-month")
+          .addEventListener("click", function () {
+            currentMonth++;
+            if (currentMonth > 11) {
+              currentMonth = 0;
+              currentYear++;
+            }
+            generateCalendar(currentMonth, currentYear);
+          });
+
+        // Управление модальным окном
+        const eventModal = document.getElementById("eventModal");
+        const closeModal = document.getElementById("closeModal");
+
+        closeModal.addEventListener("click", () => {
+          eventModal.classList.remove("active");
+        });
+
+        eventModal.addEventListener("click", (e) => {
+          if (e.target === eventModal) {
+            eventModal.classList.remove("active");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
