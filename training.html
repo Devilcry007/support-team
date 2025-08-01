@@ -734,15 +734,30 @@
         border-radius: 12px;
       }
       
+      /* Добавленные стили для окна конференции */
+      #conference-iframe {
+        width: 100%;
+        height: 80vh;
+        border: none;
+        border-radius: 12px;
+        margin-top: 15px;
+      }
+      
       @media (max-width: 768px) {
         #yandex-form-frame {
           height: 400px;
+        }
+        #conference-iframe {
+          height: 60vh;
         }
       }
       
       @media (max-width: 480px) {
         #yandex-form-frame {
           height: 350px;
+        }
+        #conference-iframe {
+          height: 50vh;
         }
       }
     </style>
@@ -989,6 +1004,15 @@
         </div>
       </div>
     </div>
+    
+    <!-- Новое модальное окно для конференции -->
+    <div class="modal-overlay" id="conferenceModal">
+      <div class="event-modal" style="max-width: 90%; height: 90%;">
+        <button class="close-modal" id="closeConferenceModal">&times;</button>
+        <h2 class="modal-title">Контур Толк: Конференция</h2>
+        <iframe id="conference-iframe"></iframe>
+      </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
@@ -1163,7 +1187,6 @@
               type: 1,
               description:
                 "Базовый курс по работе с системой для специалистов по охране труда.",
-              conferenceId: "n14aab4q4uu2",
             },
           ],
           "2025-8-15": [
@@ -1173,7 +1196,6 @@
               time: "14:00 - 16:00",
               type: 2,
               description: "Особенности работы с экологической документацией.",
-              conferenceId: "n14aab4q4uu2",
             },
             {
               id: 3,
@@ -1181,7 +1203,6 @@
               time: "16:30 - 18:30",
               type: 2,
               description: "Использование системы для проектной документации.",
-              conferenceId: "n14aab4q4uu2",
             },
           ],
           "2025-8-20": [
@@ -1192,7 +1213,6 @@
               type: 3,
               description:
                 "Основы работы с модулем kAssist для технических писателей.",
-              conferenceId: "n14aab4q4uu2",
             },
           ],
           "2025-8-25": [
@@ -1202,7 +1222,6 @@
               time: "15:00 - 17:00",
               type: 4,
               description: "Работа с нормативно-технической документацией.",
-              conferenceId: "n14aab4q4uu2",
             },
           ],
         };
@@ -1323,12 +1342,19 @@
             registerBtn.href = `#`;
             registerBtn.className = "register-btn";
             registerBtn.innerHTML = `<i class="fas fa-user-plus"></i> Зарегистрироваться`;
+            registerBtn.addEventListener('click', function(e) {
+              e.preventDefault();
+              openRegistrationForm();
+            });
             eventElement.appendChild(registerBtn);
 
-            const joinBtn = document.createElement("a");
-            joinBtn.href = `#`;
+            const joinBtn = document.createElement("button");
             joinBtn.className = "join-conference-btn";
             joinBtn.innerHTML = `<i class="fas fa-video"></i> Присоединиться`;
+            joinBtn.addEventListener('click', function(e) {
+              e.preventDefault();
+              openConference();
+            });
             eventElement.appendChild(joinBtn);
 
             eventList.appendChild(eventElement);
@@ -1412,6 +1438,30 @@
             e.preventDefault();
             openRegistrationForm();
           });
+        });
+        
+        // ======== Управление модальным окном конференции ========
+        const conferenceModal = document.getElementById('conferenceModal');
+        const closeConferenceModal = document.getElementById('closeConferenceModal');
+        const conferenceIframe = document.getElementById('conference-iframe');
+        
+        // Функция открытия конференции
+        function openConference() {
+          conferenceIframe.src = 'https://fb8k4rk4.ktalk.ru/p0oh54jravel';
+          conferenceModal.classList.add('active');
+        }
+        
+        // Обработчики закрытия
+        closeConferenceModal.addEventListener('click', () => {
+          conferenceModal.classList.remove('active');
+          conferenceIframe.src = ''; // Очищаем iframe при закрытии
+        });
+        
+        conferenceModal.addEventListener('click', (e) => {
+          if (e.target === conferenceModal) {
+            conferenceModal.classList.remove('active');
+            conferenceIframe.src = ''; // Очищаем iframe при закрытии
+          }
         });
       });
     </script>
