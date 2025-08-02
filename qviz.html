@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сертификация пользователей Техэксперт</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --orange: #ff6d00;
+            --orange-light: #ff9e40;
+            --orange-dark: #dd2c00;
+            --blue: #1565c0;
+            --blue-light: #5e92f3;
+            --white: #ffffff;
+            --black: #121212;
+            --gray: #f5f5f7;
+            --yellow: #f7d61f;
+            --success: #4caf50;
+            --error: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", system-ui, sans-serif;
+        }
+
+        body {
+            background: var(--gray);
+            color: var(--black);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            position: relative;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--orange);
+        }
+
+        .logo span {
+            color: var(--blue);
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-grow: 1;
+            justify-content: flex-end;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: var(--black);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        nav a i {
+            margin-right: 0.5rem;
+        }
+
+        nav a:hover {
+            background: rgba(255, 109, 0, 0.1);
+            color: var(--orange);
+        }
+
+        nav a.active {
+            background: rgba(255, 109, 0, 0.15);
+            color: var(--orange);
+            font-weight: 600;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--orange);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            background: var(--orange-dark);
+            transform: scale(1.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 2rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .hero-highlight {
+            color: var(--orange);
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            color: var(--black);
+            opacity: 0.9;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            gap: 0.8rem;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--orange);
+            color: var(--white);
+            box-shadow: 0 10px 20px rgba(255, 109, 0, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: var(--orange-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255, 109, 0, 0.35);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--blue);
+            border: 2px solid var(--blue);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(21, 101, 192, 0.05);
+            transform: translateY(-3px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            margin: 3rem auto;
+            max-width: 900px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .section-title:after {
+            content: "";
+            position: absolute;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 5px;
+            background: var(--orange);
+            border-radius: 5px;
+        }
+
+        .progress-container {
+            margin-bottom: 2.5rem;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--orange);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .question-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1.8rem;
+            color: var(--black);
+            line-height: 1.4;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .options {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .option {
+            padding: 1.2rem 1.5rem;
+            background-color: var(--gray);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .option:hover {
+            background-color: #e8e8e8;
+        }
+
+        .option.selected {
+            border-color: var(--blue);
+            background-color: rgba(21, 101, 192, 0.08);
+        }
+
+        /* НОВОЕ: Цвета для правильных и неправильных ответов */
+        .option.correct {
+            border-color: var(--success);
+            background-color: rgba(76, 175, 80, 0.15);
+        }
+
+        .option.incorrect {
+            border-color: var(--error);
+            background-color: rgba(244, 67, 54, 0.15);
+        }
+
+        .option-number {
+            background: var(--blue);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .explanation {
+            padding: 1.5rem;
+            background-color: rgba(21, 101, 192, 0.05);
+            border-left: 4px solid var(--blue);
+            border-radius: 0 12px 12px 0;
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .result-section {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+
+        .result-section h2 {
+            color: var(--blue);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .result-score {
+            font-size: 4rem;
+            font-weight: 800;
+            margin: 1.5rem 0;
+            color: var(--orange);
+        }
+
+        .result-message {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .certificate {
+            max-width: 100%;
+            border: 2px solid var(--blue);
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            margin: 2rem auto;
+            display: none;
+        }
+
+        .certificate.show {
+            display: block;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .retry-section {
+            margin-top: 2rem;
+        }
+
+        .retry-section h3 {
+            color: var(--blue);
+            margin-bottom: 1.5rem;
+        }
+
+        .study-links {
+            background: var(--gray);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .study-links ul {
+            list-style: none;
+            padding-left: 1.5rem;
+        }
+
+        .study-links li {
+            margin-bottom: 0.8rem;
+            position: relative;
+        }
+
+        .study-links li:before {
+            content: "•";
+            color: var(--orange);
+            position: absolute;
+            left: -1.2rem;
+            font-size: 1.2rem;
+        }
+
+        .study-links a {
+            color: var(--blue);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .study-links a:hover {
+            color: var(--orange);
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--black);
+            color: var(--white);
+            padding: 4rem 0 2rem;
+            margin-top: 4rem;
+            border-radius: 30px 30px 0 0;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-column h4 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-column h4:after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--orange);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--white);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--white);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--orange);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 3rem;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* Animation Classes */
+        .animate-in {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 2rem 1.5rem;
+            }
+            .hero {
+                min-height: auto;
+                padding: 3rem 0;
+            }
+            h1 {
+                font-size: 2.2rem;
+            }
+            .section-title {
+                font-size: 1.8rem;
+            }
+            .question-text {
+                font-size: 1.2rem;
+            }
+            .options {
+                grid-template-columns: 1fr;
+            }
+            header {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            .nav-container {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .section-title {
+                font-size: 1.6rem;
+            }
+            .btn {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Информпроект</span>Групп
+            </div>
+            
+            <div class="nav-container">
+                <nav>
+                    <ul>
+                        <li>
+                            <a href="index.html"><i class="fas fa-home"></i> Главная</a>
+                        </li>
+                        <li>
+                            <a href="training.html"><i class="fas fa-book"></i> Обучение</a>
+                        </li>
+                        <li>
+                            <!-- ИЗМЕНЕННАЯ ССЫЛКА -->
+                            <a href="qviz.html" class="active"><i class="fas fa-certificate"></i> Сертификация</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fas fa-headset"></i> Поддержка</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <!-- Иконка профиля -->
+                <div class="user-avatar" id="userAvatar" title="Личный кабинет">ИИ</div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content animate-in">
+                <h1>
+                    <span class="hero-highlight">Сертификация</span> пользователей Техэксперт
+                </h1>
+                <p class="subtitle">
+                    Подтвердите свои знания и получите официальный сертификат, подтверждающий вашу квалификацию
+                </p>
+                <div class="btn-container">
+                    <a href="#quiz" class="btn btn-primary">
+                        <i class="fas fa-play-circle"></i> Начать тестирование
+                    </a>
+                    <a href="training.html" class="btn btn-secondary">
+                        <i class="fas fa-graduation-cap"></i> Подготовиться к экзамену
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section class="section" id="quiz">
+            <div class="quiz-container">
+                <h2 class="section-title">Экзамен на подтверждение квалификации</h2>
+                
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span id="progress-text">Вопрос 1 из 10</span>
+                        <span id="score-text">0% выполнено</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress" id="progress" style="width: 10%"></div>
+                    </div>
+                </div>
+                
+                <div class="question-section" id="question-section">
+                    <div class="question-text" id="question-text">
+                        Какой модуль системы Техэксперт используется для управления нормативной документацией?
+                    </div>
+                    
+                    <div class="options" id="options">
+                        <div class="option">
+                            <div class="option-number">A</div>
+                            <div class="option-text">kNormativ</div>
+                        </div>
+                        <div class="option">
+                            <div class="option-number">B</div>
+                            <div class="option-text">kAssist</div>
+                        </div>
+                        <div class="option">
+                            <div class="option-number">C</div>
+                            <div class="option-text">kExpert</div>
+                        </div>
+                        <div class="option">
+                            <div class="option-number">D</div>
+                            <div class="option-text">kDocument</div>
+                        </div>
+                    </div>
+                    
+                    <div class="explanation" id="explanation">
+                        <strong>Объяснение:</strong> Модуль kAssist предназначен для работы с нормативной документацией и управления требованиями нормативных документов.
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn btn-secondary" id="prev-btn">
+                        <i class="fas fa-arrow-left"></i> Предыдущий
+                    </button>
+                    <button class="btn btn-primary" id="next-btn" disabled>
+                        Следующий <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="btn btn-success" id="finish-btn" style="display: none;">
+                        <i class="fas fa-check-circle"></i> Завершить тест
+                    </button>
+                </div>
+                
+                <div class="result-section" id="result-section">
+                    <h2>Результаты тестирования</h2>
+                    <div class="result-score" id="result-score">85%</div>
+                    <div class="result-message" id="result-message">
+                        Поздравляем! Вы успешно прошли сертификацию по системе Техэксперт.
+                        Ваш уровень знаний соответствует требованиям сертифицированного специалиста.
+                    </div>
+                    
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNjAwIDQwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjUwJSIgeT0iMzAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDUhOTljIj5TZXJ0aWZpY2F0ZSBvZiBBY2hpZXZlbWVudDwvdGV4dD48dGV4dCB4PSI1MCUiIHk9IjQwJSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDA1YTljIj5UaGlzIGNlcnRpZmljYXRlIGlzIGF3YXJkZWQgdG88L3RleHQ+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDUhOTljIj5bVXNlciBOYW1lXTwvdGV4dD48dGV4dCB4PSI1MCUiIHk9IjYwJSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDA1YTljIj5mb3Igc3VjY2Vzc2Z1bCBjb21wbGV0aW9uIG9mIHRoZSBUZWNoRXhwZXJ0IFF1aXo8L3RleHQ+PHRleHQgeD0iNTAlIiB5PSI3NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzY2NiI+Q2VydGlmaWNhdGUgSUQ6IFRFUS0yMDI1LTUyOTwvdGV4dD48L3N2Zz4=" 
+                         alt="Сертификат" 
+                         class="certificate" 
+                         id="certificate">
+                    
+                    <div class="actions" id="certificate-actions">
+                        <!-- Кнопка сохранить будет добавляться динамически -->
+                    </div>
+                    
+                    <div class="retry-section" id="retry-section" style="display: none;">
+                        <h3>Рекомендуем подготовиться</h3>
+                        <div class="study-links">
+                            <p>Для улучшения результата изучите материалы:</p>
+                            <ul>
+                                <li><a href="#">Руководство пользователя Техэксперт</a></li>
+                                <li><a href="#">Видеокурс по основам работы</a></li>
+                                <li><a href="#">Часто задаваемые вопросы</a></li>
+                                <li><a href="#">Документация по модулям</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>Служба поддержки пользователей</h4>
+                    <p>
+                        Преобразуем работу специалистов с нормативно-технической
+                        документацией в оптимизированное хобби
+                    </p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-vk"></i></a>
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Ресурсы</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Документация</a></li>
+                        <li><a href="#">Блог</a></li>
+                        <li><a href="#">Вебинары</a></li>
+                        <li><a href="#">Частые вопросы</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Обучение</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Курсы</a></li>
+                        <li><a href="qviz.html">Сертификация</a></li>
+                        <li><a href="#">Расписание</a></li>
+                        <li><a href="#">Групповое обучение</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Контакты</h4>
+                    <ul class="footer-links">
+                        <li>
+                            <a href="#"
+                                ><i class="fas fa-envelope"></i> vankor@iprosoft.ru</a
+                            >
+                        </li>
+                        <li>
+                            <a href="#"><i class="fas fa-phone"></i> +8 800 555 3535</a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                ><i class="fas fa-map-marker-alt"></i> Москва, ул.
+                                Четапоказабыл, 007</a
+                            >
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>© 2025 Информпроект Групп. Служба поддержки "РН-Ванкор".</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Quiz data
+            const quizQuestions = [
+                {
+                    question: "Какой модуль системы Техэксперт используется для управления нормативной документацией?",
+                    options: ["kNormativ", "kAssist", "kExpert", "kDocument"],
+                    correctAnswer: 1,
+                    explanation: "Модуль kAssist предназначен для работы с нормативной документацией и управления требованиями нормативных документов."
+                },
+                {
+                    question: "Как часто обновляются базы нормативных документов в Техэксперт?",
+                    options: ["Ежедневно", "Еженедельно", "Ежемесячно", "Ежеквартально"],
+                    correctAnswer: 0,
+                    explanation: "Базы нормативных документов обновляются ежедневно для обеспечения актуальности информации."
+                },
+                {
+                    question: "Какой раздел содержит шаблоны локальных нормативных актов?",
+                    options: ["Библиотека документов", "kConstruct", "kNormativ", "Шаблоны ЛНА"],
+                    correctAnswer: 3,
+                    explanation: "Раздел 'Шаблоны ЛНА' содержит готовые образцы локальных нормативных актов для различных отраслей."
+                },
+                {
+                    question: "Как добавить документ в 'Мои документы'?",
+                    options: [
+                        "Через контекстное меню документа", 
+                        "Автоматически при просмотре",
+                        "Через настройки профиля",
+                        "Документы нельзя сохранять"
+                    ],
+                    correctAnswer: 0,
+                    explanation: "Для добавления документа в 'Мои документы' нужно использовать контекстное меню (правая кнопка мыши на документе)."
+                },
+                {
+                    question: "Как создать отчет о проверке нормативных документов?",
+                    options: [
+                        "Через модуль kReporting", 
+                        "Автоматически при обновлении",
+                        "Через меню 'Сервис'",
+                        "Отчеты создаются только администратором"
+                    ],
+                    correctAnswer: 0,
+                    explanation: "Модуль kReporting позволяет создавать различные отчеты, включая отчеты о проверке нормативных документов."
+                }
+            ];
+
+            // DOM Elements
+            const questionText = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options');
+            const explanationDiv = document.getElementById('explanation');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const finishBtn = document.getElementById('finish-btn');
+            const progressText = document.getElementById('progress-text');
+            const scoreText = document.getElementById('score-text');
+            const progressBar = document.getElementById('progress');
+            const questionSection = document.getElementById('question-section');
+            const resultSection = document.getElementById('result-section');
+            const resultScore = document.getElementById('result-score');
+            const resultMessage = document.getElementById('result-message');
+            const certificate = document.getElementById('certificate');
+            const retrySection = document.getElementById('retry-section');
+            const certificateActions = document.getElementById('certificate-actions');
+            const retryBtn = document.getElementById('retry-btn');
+
+            // Quiz state
+            let currentQuestion = 0;
+            let userAnswers = new Array(quizQuestions.length).fill(null);
+            let score = 0;
+
+            // Initialize quiz
+            function initQuiz() {
+                showQuestion();
+                updateProgress();
+                
+                // Event listeners
+                prevBtn.addEventListener('click', goToPrevQuestion);
+                nextBtn.addEventListener('click', goToNextQuestion);
+                finishBtn.addEventListener('click', finishQuiz);
+            }
+
+            // Show current question
+            function showQuestion() {
+                const question = quizQuestions[currentQuestion];
+                questionText.textContent = question.question;
+                
+                // Clear previous options
+                optionsContainer.innerHTML = '';
+                
+                // Add new options
+                question.options.forEach((option, index) => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'option';
+                    if (userAnswers[currentQuestion] === index) {
+                        optionElement.classList.add('selected');
+                    }
+                    
+                    optionElement.innerHTML = `
+                        <div class="option-number">${String.fromCharCode(65 + index)}</div>
+                        <div class="option-text">${option}</div>
+                    `;
+                    
+                    optionElement.addEventListener('click', () => selectOption(index));
+                    optionsContainer.appendChild(optionElement);
+                });
+                
+                // Show explanation if answer was selected
+                if (userAnswers[currentQuestion] !== null) {
+                    showAnswerFeedback();
+                } else {
+                    explanationDiv.classList.remove('show');
+                    nextBtn.disabled = true;
+                }
+                
+                // Update button visibility
+                prevBtn.style.display = currentQuestion === 0 ? 'none' : 'inline-flex';
+                finishBtn.style.display = currentQuestion === quizQuestions.length - 1 ? 'inline-flex' : 'none';
+                nextBtn.style.display = currentQuestion === quizQuestions.length - 1 ? 'none' : 'inline-flex';
+            }
+
+            // Select an option
+            function selectOption(optionIndex) {
+                // Если ответ уже был выбран, ничего не делаем
+                if (userAnswers[currentQuestion] !== null) return;
+                
+                userAnswers[currentQuestion] = optionIndex;
+                
+                // Show feedback
+                showAnswerFeedback();
+            }
+
+            // Показать обратную связь по ответу
+            function showAnswerFeedback() {
+                const question = quizQuestions[currentQuestion];
+                const selectedOption = userAnswers[currentQuestion];
+                
+                // Пометить все варианты
+                const options = optionsContainer.querySelectorAll('.option');
+                options.forEach((option, index) => {
+                    // Убрать возможность выбора
+                    option.removeEventListener('click', selectOption);
+                    
+                    // Добавить классы в зависимости от правильности
+                    if (index === question.correctAnswer) {
+                        option.classList.add('correct');
+                    } else if (index === selectedOption && index !== question.correctAnswer) {
+                        option.classList.add('incorrect');
+                    }
+                });
+                
+                // Показать объяснение
+                explanationDiv.textContent = question.explanation;
+                explanationDiv.classList.add('show');
+                
+                // Разблокировать кнопку "Далее"
+                nextBtn.disabled = false;
+            }
+
+            // Go to next question
+            function goToNextQuestion() {
+                if (currentQuestion < quizQuestions.length - 1) {
+                    currentQuestion++;
+                    showQuestion();
+                    updateProgress();
+                }
+            }
+
+            // Go to previous question
+            function goToPrevQuestion() {
+                if (currentQuestion > 0) {
+                    currentQuestion--;
+                    showQuestion();
+                    updateProgress();
+                }
+            }
+
+            // Update progress
+            function updateProgress() {
+                const answeredCount = userAnswers.filter(answer => answer !== null).length;
+                const progressPercent = Math.round((currentQuestion + 1) / quizQuestions.length * 100);
+                
+                progressText.textContent = `Вопрос ${currentQuestion + 1} из ${quizQuestions.length}`;
+                scoreText.textContent = `${progressPercent}% выполнено`;
+                progressBar.style.width = `${progressPercent}%`;
+            }
+
+            // Finish quiz and show results
+            function finishQuiz() {
+                // Calculate score
+                score = 0;
+                userAnswers.forEach((answer, index) => {
+                    if (answer === quizQuestions[index].correctAnswer) {
+                        score++;
+                    }
+                });
+                
+                const scorePercent = Math.round(score / quizQuestions.length * 100);
+                
+                // Show results
+                questionSection.style.display = 'none';
+                resultSection.style.display = 'block';
+                resultScore.textContent = `${scorePercent}%`;
+                
+                if (scorePercent >= 80) {
+                    resultMessage.textContent = `Поздравляем! Вы успешно прошли сертификацию по системе Техэксперт. Ваш уровень знаний соответствует требованиям сертифицированного специалиста. Правильных ответов: ${score} из ${quizQuestions.length}.`;
+                    certificate.classList.add('show');
+                    retrySection.style.display = 'none';
+                    
+                    // Добавляем кнопку сохранения сертификата только при успешном прохождении
+                    certificateActions.innerHTML = `
+                        <button class="btn btn-primary" id="save-certificate">
+                            <i class="fas fa-download"></i> Сохранить сертификат
+                        </button>
+                        <button class="btn btn-secondary" id="retry-btn">
+                            <i class="fas fa-redo"></i> Пройти еще раз
+                        </button>
+                    `;
+                    
+                    document.getElementById('save-certificate').addEventListener('click', saveCertificate);
+                } else {
+                    resultMessage.textContent = `Вы ответили правильно на ${score} из ${quizQuestions.length} вопросов (${scorePercent}%). Для успешного прохождения сертификации необходимо набрать не менее 80%. Рекомендуем подготовиться и попробовать снова.`;
+                    certificate.classList.remove('show');
+                    retrySection.style.display = 'block';
+                    
+                    // Для неуспешного прохождения показываем только кнопку повтора
+                    certificateActions.innerHTML = `
+                        <button class="btn btn-secondary" id="retry-btn">
+                            <i class="fas fa-redo"></i> Пройти еще раз
+                        </button>
+                    `;
+                }
+                
+                // Добавляем обработчик для кнопки повтора
+                document.getElementById('retry-btn').addEventListener('click', restartQuiz);
+            }
+
+            // Restart quiz
+            function restartQuiz() {
+                currentQuestion = 0;
+                userAnswers = new Array(quizQuestions.length).fill(null);
+                score = 0;
+                
+                resultSection.style.display = 'none';
+                questionSection.style.display = 'block';
+                
+                showQuestion();
+                updateProgress();
+            }
+
+            // Save certificate
+            function saveCertificate() {
+                alert("Сертификат сохранен в вашем личном кабинете. Вы также можете скачать его в формате PDF.");
+                // In a real application, this would trigger a PDF download
+            }
+
+            // Initialize the quiz
+            initQuiz();
+        });
+    </script>
+</body>
+</html>
