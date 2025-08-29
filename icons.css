@@ -1,0 +1,96 @@
+/* SVG Icon Styles */
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  fill: currentColor;
+}
+
+.icon-sm { width: 0.875em; height: 0.875em; }
+.icon-lg { width: 1.33em; height: 1.33em; }
+.icon-xl { width: 1.5em; height: 1.5em; }
+
+/* Icon colors */
+.icon-primary { fill: var(--orange, #ff6d00); }
+.icon-secondary { fill: var(--blue, #1565c0); }
+.icon-success { fill: #28a745; }
+.icon-danger { fill: #dc3545; }
+.icon-warning { fill: #ffc107; }
+.icon-info { fill: #17a2b8; }
+.icon-light { fill: var(--gray-dark, #e0e0e0); }
+.icon-dark { fill: var(--black, #121212); }
+
+/* Icon animations */
+.icon-spin {
+  animation: icon-spin 2s linear infinite;
+}
+
+@keyframes icon-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.icon-pulse {
+  animation: icon-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes icon-pulse {
+  from { opacity: 1; }
+  to { opacity: 0.5; }
+}
+
+/* Icon with text alignment */
+.icon-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+/* Icon button styles */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+.icon-btn:active {
+  transform: translateY(0);
+}
+
+/* Social media icons */
+.icon-social {
+  width: 1.5em;
+  height: 1.5em;
+  transition: transform 0.2s ease;
+}
+
+.icon-social:hover {
+  transform: scale(1.1);
+}
+
+/* Navigation icons */
+.nav-icon {
+  width: 1.2em;
+  height: 1.2em;
+  margin-right: 0.5em;
+}
+
+/* Footer icons */
+.footer-icon {
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.25em;
+}

@@ -25,10 +25,8 @@
       rel="apple-touch-icon"
       href="foto/tech180.png"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
       :root {
         --orange: #ff6d00;
@@ -85,6 +83,15 @@
 
       .scroll-down #canvas3d {
         opacity: 0.3;
+      }
+
+      /* Статичный CSS-паттерн как фолбэк */
+      .static-bg::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        background: var(--gray);
       }
 
       /* Стили для заставки */
@@ -305,6 +312,7 @@
         padding: 8rem 0;
         position: relative;
       }
+      .section, .team, .resources { content-visibility: auto; contain-intrinsic-size: 1000px 800px; }
 
       .section-title {
         text-align: center;
@@ -450,6 +458,8 @@
         border: 5px solid var(--white);
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
       }
+      @media (max-width: 480px) { .card { backdrop-filter: none; background: #fff; } }
+      @media (prefers-reduced-motion: reduce) { .animate-in { animation: none !important; } #canvas3d { display: none; } }
 
       .member-name {
         font-size: 1.4rem;
@@ -651,6 +661,13 @@
           justify-content: center;
         }
       }
+
+      /* Предпочтение меньшей анимации: скрываем canvas и включаем статичный фон */
+      @media (prefers-reduced-motion: reduce) {
+        #canvas3d { display: none; }
+        body { overflow-x: hidden; }
+        body.static-bg::before { display: block; }
+      }
     </style>
   </head>
   <body>
@@ -659,10 +676,7 @@
       <div class="intro-container">
         <div class="intro-image">
           <!-- Замените src на путь к вашей картинке -->
-          <img
-            src="foto/rosneft.jpg"
-            alt="Техэксперт"
-          />
+          <img src="foto/rosneft.jpg" alt="Техэксперт" width="180" height="180" fetchpriority="high" />
         </div>
         <div class="intro-text"><span>Служба поддержки</span>Техэксперт</div>
       </div>
@@ -808,33 +822,21 @@
         <div class="team">
           <div class="team-grid">
             <div class="team-member animate-in">
-              <img
-                src="foto/nikita.png"
-                alt="Эксперт"
-                class="member-photo"
-              />
+              <img src="foto/nikita.png" alt="Эксперт" class="member-photo" loading="lazy" decoding="async" width="160" height="160" />
               <h3 class="member-name">Шепелин Никита</h3>
               <p class="member-role">Главный крутышка проекта</p>
               <p>25+ лет опыта на планете Земля</p>
             </div>
 
             <div class="team-member animate-in delay-1">
-              <img
-                src="foto/alex.jpg"
-                alt="Эксперт"
-                class="member-photo"
-              />
+              <img src="foto/alex.jpg" alt="Эксперт" class="member-photo" loading="lazy" decoding="async" width="160" height="160" />
               <h3 class="member-name">Алексей Гречко</h3>
               <p class="member-role">Главный задумыватель</p>
               <p>Сколько опыта не знаем, он он есть</p>
             </div>
 
             <div class="team-member animate-in delay-2">
-              <img
-                src="foto/4uvak.jpeg"
-                alt="Эксперт"
-                class="member-photo"
-              />
+              <img src="foto/4uvak.jpeg" alt="Эксперт" class="member-photo" loading="lazy" decoding="async" width="160" height="160" />
               <h3 class="member-name">Тестовый Чувак</h3>
               <p class="member-role">Технический эксперт</p>
               <p>Специалист сопровождения</p>
@@ -930,10 +932,11 @@
         antialias: true,
       });
       renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
-      // Увеличенная геометрия для фона
+      // Увеличенная геометрия для фона (оптимизировано)
       const points = [];
-      const pointCount = 100; // Увеличили количество точек
+      let pointCount = 60; // динамически регулируемое количество
 
       for (let i = 0; i < pointCount; i++) {
         points.push({
@@ -985,51 +988,101 @@
         }
       }, 50);
 
-      // Анимация основного фона
-      function animate() {
+      // Анимация основного фона (оптимизировано)
+      let lastRenderTime = 0;
+      let targetFPS = 30;
+      let frameInterval = 1000 / targetFPS;
+      let lowFpsStrikes = 0;
+      let maxLines = 600;
+      let paused = false;
+
+      // Остановка рендера при скрытии вкладки
+      document.addEventListener('visibilitychange', () => {
+        paused = document.hidden;
+      });
+
+      // Учет prefers-reduced-motion
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      function applyReduceMotion() {
+        if (reduceMotion.matches) {
+          paused = true;
+          document.body.classList.add('static-bg');
+        } else {
+          document.body.classList.remove('static-bg');
+        }
+      }
+      reduceMotion.addEventListener ? reduceMotion.addEventListener('change', applyReduceMotion) : reduceMotion.addListener(applyReduceMotion);
+      applyReduceMotion();
+      function animate(timestamp) {
         requestAnimationFrame(animate);
+        if (paused) return;
+        const now = timestamp || performance.now();
+        const deltaTime = now - lastRenderTime;
+        if (deltaTime < frameInterval || document.hidden) return;
+        lastRenderTime = now - (deltaTime % frameInterval);
 
         // Очищаем предыдущие линии
         while (lineGroup.children.length > 0) {
           lineGroup.remove(lineGroup.children[0]);
         }
 
-        // Обновляем позиции и создаем соединения
+        // Обновляем позиции и создаем соединения (с ограничением количества линий)
+        let lineCounter = 0;
         points.forEach((point, i) => {
           point.position.add(point.velocity);
 
-          // Отскок от границ
           ["x", "y", "z"].forEach((axis) => {
             if (Math.abs(point.position[axis]) > 50) {
-              // Увеличенные границы
               point.velocity[axis] *= -1;
             }
           });
 
-          // Создаем линии между близкими точками
           for (let j = i + 1; j < points.length; j++) {
+            if (lineCounter >= maxLines) break;
             const distance = point.position.distanceTo(points[j].position);
-            if (distance < 15) {
-              // Увеличенный радиус соединения
+            if (distance < 14) {
               const geometry = new THREE.BufferGeometry().setFromPoints([
                 point.position,
                 points[j].position,
               ]);
               const line = new THREE.Line(geometry, lineMaterial);
+              line.material.opacity = 0.25 - (distance / 14) * 0.15;
               lineGroup.add(line);
-
-              // Плавное изменение прозрачности в зависимости от расстояния
-              line.material.opacity = 0.3 - (distance / 15) * 0.2;
+              lineCounter++;
             }
           }
         });
 
-        // Плавное вращение камеры
         camera.position.x = Math.sin(Date.now() * 0.0005) * 30;
         camera.position.z = 50 + Math.cos(Date.now() * 0.0003) * 20;
         camera.lookAt(scene.position);
 
         renderer.render(scene, camera);
+
+        // Измеряем FPS и адаптируем сложность
+        const actualFPS = 1000 / deltaTime;
+        if (actualFPS < 24) {
+          lowFpsStrikes++;
+          if (lowFpsStrikes >= 5) {
+            // Уменьшаем сложность постепенно
+            maxLines = Math.max(200, Math.floor(maxLines * 0.8));
+            if (points.length > 40) {
+              points.splice(0, Math.ceil(points.length * 0.2));
+              pointCount = points.length;
+            }
+            targetFPS = 24;
+            frameInterval = 1000 / targetFPS;
+            document.body.classList.add('static-bg');
+            lowFpsStrikes = 0;
+          }
+        } else if (actualFPS > 28) {
+          // Восстанавливаем немного, но в разумных пределах
+          lowFpsStrikes = 0;
+          maxLines = Math.min(600, Math.floor(maxLines * 1.05));
+          targetFPS = 30;
+          frameInterval = 1000 / targetFPS;
+          document.body.classList.remove('static-bg');
+        }
       }
 
       animate();
@@ -1039,6 +1092,7 @@
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
       });
 
       // Анимация при прокрутке

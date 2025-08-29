@@ -25,10 +25,12 @@
       rel="apple-touch-icon"
       href="foto/tech180.png"
     />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    	<link rel="stylesheet" href="app.min.css" />
     <style>
       :root {
         --orange: #ff6d00;
@@ -81,6 +83,15 @@
 
       .content-visible .container {
         opacity: 1;
+      }
+
+      /* Статичный CSS-паттерн как фолбэк */
+      .static-bg::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        background: var(--gray);
       }
 
       /* Стили для заставки */
@@ -240,6 +251,7 @@
         position: relative;
         z-index: 5;
       }
+      .training-section, .calendar-column, .events-column { content-visibility: auto; contain-intrinsic-size: 1000px 800px; }
 
       .section-title {
         text-align: center;
@@ -781,14 +793,128 @@
           height: 50vh;
         }
       }
+      /* Предпочтение меньшей анимации */
+      @media (prefers-reduced-motion: reduce) {
+        #canvas3d { display: none; }
+        body.static-bg::before { display: block; }
+      }
+
+      /* ============ Бургер-меню (вторичные страницы) ============ */
+      /* Скрываем стандартную навигацию в шапке */
+      .nav-container nav {
+        display: none;
+      }
+
+      .hamburger-wrapper {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 900;
+      }
+
+      .hamburger {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--orange);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 16px rgba(255, 109, 0, 0.35);
+        transition: transform 0.25s ease;
+      }
+
+      .hamburger:hover {
+        transform: translateY(-2px);
+      }
+
+      .hamburger .line {
+        width: 22px;
+        height: 2px;
+        background: #fff;
+        position: relative;
+        border-radius: 2px;
+      }
+
+      .hamburger .line::before,
+      .hamburger .line::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        width: 22px;
+        height: 2px;
+        background: #fff;
+        border-radius: 2px;
+      }
+
+      .hamburger .line::before {
+        top: -7px;
+      }
+      .hamburger .line::after {
+        top: 7px;
+      }
+
+      .side-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 280px;
+        background: #fff;
+        border-right: 1px solid rgba(0,0,0,0.08);
+        box-shadow: 8px 0 30px rgba(0,0,0,0.08);
+        padding: 80px 20px 20px;
+        transform: translateX(-110%);
+        transition: transform 0.3s ease;
+      }
+
+      .side-nav a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        color: var(--black);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .side-nav a:hover {
+        background: rgba(255, 109, 0, 0.08);
+        color: var(--orange);
+      }
+
+      /* Открытие по hover и по классу */
+      .hamburger-wrapper:hover .side-nav,
+      .hamburger-wrapper.open .side-nav,
+      .side-nav:hover {
+        transform: translateX(0);
+      }
     </style>
   </head>
-  <body>
+  <body class="has-burger">
+    <!-- Бургер-меню -->
+    <div class="hamburger-wrapper" id="hamburgerMenu">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Открыть меню">
+        <span class="line"></span>
+      </button>
+      <nav class="side-nav" aria-label="Навигация">
+        <a href="index.html"><i class="fas fa-home"></i> Главная</a>
+        <a href="training.html"><i class="fas fa-book"></i> Обучение</a>
+        <a href="rpg-quiz.html"><i class="fas fa-gift"></i> Квиз с подарками</a>
+        <a href="qviz.html"><i class="fas fa-certificate"></i> Сертификация</a>
+        <a href="index.html#team"><i class="fas fa-users"></i> Команда</a>
+        <a href="account.html"><i class="fas fa-user"></i> Кабинет</a>
+      </nav>
+    </div>
     <!-- Заставка с логотипом и прогрессом -->
     <div class="intro-overlay" id="introOverlay">
       <div class="intro-container">
         <div class="intro-image">
-          <img src="rosneft.jpg" alt="Техэксперт" />
+          <img src="foto/rosneft.jpg" alt="Техэксперт" width="180" height="180" fetchpriority="high" />
         </div>
         <div class="intro-text"><span>Обучение</span>Техэксперт</div>
       </div>
@@ -813,21 +939,23 @@
           <nav>
             <ul>
               <li>
-                <a href="index.html"><i class="fas fa-fire"></i> Новинки</a>
+                <a href="index.html"><i class="fas fa-home"></i> Главная</a>
               </li>
               <li>
-                <a href="#" class="active"
-                  ><i class="fas fa-book"></i> Обучение</a
-                >
+                <a href="training.html" class="active"
+                  ><i class="fas fa-book"></i> Обучение</a>
               </li>
               <li>
-                <a href="#"><i class="fas fa-certificate"></i> Сертификация</a>
+                <a href="rpg-quiz.html"><i class="fas fa-gift"></i> Квиз с подарками</a>
               </li>
               <li>
-                <a href="#"><i class="fas fa-users"></i> Команда</a>
+                <a href="qviz.html"><i class="fas fa-certificate"></i> Сертификация</a>
               </li>
               <li>
-                <a href="#"><i class="fas fa-headset"></i> Поддержка</a>
+                <a href="index.html#team"><i class="fas fa-users"></i> Команда</a>
+              </li>
+              <li>
+                <a href="https://te.dc-ipk.ru/docs"><i class="fas fa-headset"></i> Поддержка</a>
               </li>
             </ul>
           </nav>
@@ -1036,6 +1164,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="app.min.js"></script>
     <script>
       // ================== АНИМАЦИЯ ЗАГРУЗКИ ==================
       const introOverlay = document.getElementById("introOverlay");
@@ -1056,10 +1185,11 @@
         antialias: true,
       });
       renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
       // Оптимизированная геометрия для фона
       const points = [];
-      const pointCount = 60; // Уменьшили количество точек для оптимизации
+      const pointCount = 50; // Доп. оптимизация: меньше точек
 
       for (let i = 0; i < pointCount; i++) {
         points.push({
@@ -1113,11 +1243,21 @@
 
       // Оптимизированная анимация основного фона
       let lastRenderTime = 0;
-      const targetFPS = 30;
-      const frameInterval = 1000 / targetFPS;
+      let targetFPS = 30; // ограничение FPS
+      let frameInterval = 1000 / targetFPS;
+      let lowFpsStrikes = 0;
+      let maxLines = 500;
+      let paused = false;
+
+      document.addEventListener('visibilitychange', () => { paused = document.hidden; });
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      function applyReduceMotion(){ if (reduceMotion.matches) { paused = true; document.body.classList.add('static-bg'); } else { document.body.classList.remove('static-bg'); } }
+      reduceMotion.addEventListener ? reduceMotion.addEventListener('change', applyReduceMotion) : reduceMotion.addListener(applyReduceMotion);
+      applyReduceMotion();
 
       function animate(timestamp) {
         requestAnimationFrame(animate);
+        if (paused) return;
 
         // Регулировка FPS
         const now = timestamp || performance.now();
@@ -1145,6 +1285,7 @@
 
           // Создаем линии между близкими точками
           for (let j = i + 1; j < points.length; j++) {
+            if (lineGroup.children.length >= maxLines) break;
             const distance = point.position.distanceTo(points[j].position);
             if (distance < 20) {
               const geometry = new THREE.BufferGeometry().setFromPoints([
@@ -1164,6 +1305,27 @@
         camera.lookAt(scene.position);
 
         renderer.render(scene, camera);
+
+        const actualFPS = 1000 / deltaTime;
+        if (actualFPS < 24) {
+          lowFpsStrikes++;
+          if (lowFpsStrikes >= 5) {
+            maxLines = Math.max(150, Math.floor(maxLines * 0.8));
+            if (points.length > 35) {
+              points.splice(0, Math.ceil(points.length * 0.15));
+            }
+            targetFPS = 24;
+            frameInterval = 1000 / targetFPS;
+            document.body.classList.add('static-bg');
+            lowFpsStrikes = 0;
+          }
+        } else if (actualFPS > 28) {
+          lowFpsStrikes = 0;
+          maxLines = Math.min(500, Math.floor(maxLines * 1.05));
+          targetFPS = 30;
+          frameInterval = 1000 / targetFPS;
+          document.body.classList.remove('static-bg');
+        }
       }
 
       animate();
@@ -1173,6 +1335,7 @@
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
       });
 
       // Анимация при прокрутке
@@ -1485,6 +1648,24 @@
           }
         });
       });
+    </script>
+    <script>
+      // Открытие меню по клику (для тач-устройств)
+      (function(){
+        var wrapper = document.getElementById('hamburgerMenu');
+        var btn = document.getElementById('hamburgerBtn');
+        if (btn && wrapper) {
+          btn.addEventListener('click', function(e){
+            e.stopPropagation();
+            wrapper.classList.toggle('open');
+          });
+          document.addEventListener('click', function(e){
+            if (!wrapper.contains(e.target)) {
+              wrapper.classList.remove('open');
+            }
+          });
+        }
+      })();
     </script>
     <script src="https://forms.yandex.ru/_static/embed.js"></script>
   </body>

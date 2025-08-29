@@ -12,6 +12,8 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    	<link rel="stylesheet" href="app.min.css" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
     <style>
       :root {
         --orange: #ff6d00;
@@ -53,6 +55,18 @@
         align-items: center;
         padding: 1.5rem 0;
       }
+      /* Бургер-меню */
+      .hamburger-wrapper { position: fixed; top: 20px; left: 20px; z-index: 900; }
+      .hamburger { width: 44px; height: 44px; border-radius: 12px; background: var(--orange); border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(255,109,0,.35); transition: transform .25s; }
+      .hamburger:hover { transform: translateY(-2px); }
+      .hamburger .line { width: 22px; height: 2px; background: #fff; position: relative; border-radius: 2px; }
+      .hamburger .line:before, .hamburger .line:after { content: ""; position: absolute; left: 0; width: 22px; height: 2px; background: #fff; border-radius: 2px; }
+      .hamburger .line:before { top: -7px; }
+      .hamburger .line:after { top: 7px; }
+      .side-nav { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; border-right: 1px solid rgba(0,0,0,.08); box-shadow: 8px 0 30px rgba(0,0,0,.08); padding: 80px 20px 20px; transform: translateX(-110%); transition: transform .3s ease; }
+      .side-nav a { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 10px; color: var(--black); text-decoration: none; font-weight: 600; margin-bottom: 8px; }
+      .side-nav a:hover { background: rgba(255,109,0,.08); color: var(--orange); }
+      .hamburger-wrapper:hover .side-nav, .hamburger-wrapper.open .side-nav, .side-nav:hover { transform: translateX(0); }
 
       .logo {
         display: flex;
@@ -262,6 +276,8 @@
         gap: 25px;
         margin-top: 1.5rem;
       }
+      .quiz-selection, .game-container, .sidebar { content-visibility: auto; contain-intrinsic-size: 1000px 800px; }
+      @media (prefers-reduced-motion: reduce) { .animate-in { animation: none !important; } }
 
       .game-section {
         background: var(--card-bg);
@@ -735,7 +751,19 @@
       }
     </style>
   </head>
-  <body>
+  <body class="has-burger">
+    <!-- Бургер-меню -->
+    <div class="hamburger-wrapper" id="hamburgerMenu">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Открыть меню"><span class="line"></span></button>
+      <nav class="side-nav" aria-label="Навигация">
+        <a href="index.html"><i class="fas fa-home"></i> Главная</a>
+        <a href="training.html"><i class="fas fa-book"></i> Обучение</a>
+        <a href="rpg-quiz.html"><i class="fas fa-gift"></i> Квиз с подарками</a>
+        <a href="qviz.html"><i class="fas fa-certificate"></i> Сертификация</a>
+        <a href="index.html#team"><i class="fas fa-users"></i> Команда</a>
+        <a href="account.html"><i class="fas fa-user"></i> Кабинет</a>
+      </nav>
+    </div>
     <div class="container">
       <!-- Шапка -->
       <header class="quiz-header">
@@ -1648,7 +1676,10 @@
             card.style.transform = "translateY(0)";
           });
         }, 300);
+
+        // Burger handled by shared app.js
       });
     </script>
+    	<script src="app.min.js"></script>
   </body>
 </html>
